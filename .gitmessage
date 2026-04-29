@@ -1,0 +1,10 @@
+
+# <type>: <subject>
+#
+# type: feat, fix, docs, chore, build, refactor, test, style
+#
+# === Conventional Commits ===
+# feat: <description>
+# fix: <description>
+# build: <description>
+# chore(deps): <description>
