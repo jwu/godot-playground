@@ -1,0 +1,55 @@
+# Cocogitto configuration for godot-playground
+# Conventional Commits 校验 + 自动 changelog
+
+from_latest_tag = false
+ignore_merge_commits = true
+ignore_fixup_commits = true
+disable_changelog = false
+disable_bump_commit = false
+tag_prefix = "v"
+skip_ci = "[skip ci]"
+skip_untracked = false
+pre_bump_hooks = []
+post_bump_hooks = []
+pre_package_bump_hooks = []
+post_package_bump_hooks = []
+
+scopes = [
+    "scene",
+    "script",
+    "asset",
+    "addon",
+    "physics",
+    "render",
+    "ui",
+    "input",
+    "audio",
+    "config",
+    "menu",
+]
+
+[git_hooks.commit-msg]
+script = '''
+#!/bin/sh
+cog verify --file "$1"
+'''
+
+
+[commit_types]
+feat = { changelog_title = "新功能" }
+fix = { changelog_title = "Bug 修复" }
+docs = { changelog_title = "文档" }
+style = { changelog_title = "代码风格" }
+refactor = { changelog_title = "重构" }
+test = { changelog_title = "测试" }
+chore = { changelog_title = "工具/配置" }
+perf = { changelog_title = "性能优化" }
+ci = { changelog_title = "持续集成" }
+revert = { changelog_title = "回退" }
+build = { changelog_title = "构建" }
+
+[changelog]
+path = "CHANGELOG.md"
+authors = []
+
+[bump_profiles]
