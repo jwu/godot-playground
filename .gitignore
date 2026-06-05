@@ -45,3 +45,6 @@ desktop.ini
 
 # GDScript transient files
 *.uid
+
+# gdUnit4 test reports
+reports/

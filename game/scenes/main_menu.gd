@@ -17,6 +17,7 @@ func _ready() -> void:
   get_window().content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
 
   $VBoxContainer/SampleTestBtn.pressed.connect(_on_sample_test_pressed)
+  $VBoxContainer/DebugDraw2DBtn.pressed.connect(_on_debug_draw_2d_pressed)
   $VBoxContainer/QuitBtn.pressed.connect(_on_quit_pressed)
   _update_size_display()
   get_tree().root.size_changed.connect(_update_size_display)
@@ -32,6 +33,10 @@ func _update_size_display() -> void:
 
 func _on_sample_test_pressed() -> void:
   get_tree().change_scene_to_file("res://scenes/sample_test.tscn")
+
+
+func _on_debug_draw_2d_pressed() -> void:
+  get_tree().change_scene_to_file("res://scenes/debug_draw_2d.tscn")
 
 
 func _on_quit_pressed() -> void:

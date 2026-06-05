@@ -18,6 +18,24 @@ upgrade:
   cargo install cocogitto --force
   cargo install --git https://github.com/GDQuest/GDScript-formatter --force
 
+# ── 测试 ──────────────────────────────────────────────
+
+# 运行 gdUnit4 测试（headless，无参=全部测试，有参=指定测试文件）
+test *test_file='':
+  @cd game && _tf=$(echo "{{test_file}}" | sed 's|^game/||'); if [ -z "$_tf" ]; then \
+    GODOT_BIN=$(which godot) bash addons/gdUnit4/runtest.sh --headless --ignoreHeadlessMode --add tests/; \
+  else \
+    GODOT_BIN=$(which godot) bash addons/gdUnit4/runtest.sh --headless --ignoreHeadlessMode --add "$_tf"; \
+  fi
+
+# 同上，但保留 GUI 窗口（调试用，可观察渲染/输入过程）
+test-window *test_file='':
+  @cd game && _tf=$(echo "{{test_file}}" | sed 's|^game/||'); if [ -z "$_tf" ]; then \
+    GODOT_BIN=$(which godot) bash addons/gdUnit4/runtest.sh --add tests/; \
+  else \
+    GODOT_BIN=$(which godot) bash addons/gdUnit4/runtest.sh --add "$_tf"; \
+  fi
+
 # ── 代码检查 ──────────────────────────────────────────
 
 # 仅格式检查（无参=全项目，有参=指定文件）
