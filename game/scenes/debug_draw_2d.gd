@@ -4,6 +4,9 @@ extends ColorRect
 ## 左侧为预设 Demo 形状，中间区域可以鼠标自由画线，
 ## 顶部工具栏可切换颜色、线宽、清除画布。
 
+const DESIGN_WIDTH := 1280
+const DESIGN_HEIGHT := 720
+
 # 鼠标画线相关
 var _drawing := false
 var _lines: Array[Dictionary] = [] # [{points: PackedVector2Array, color: Color, width: float}]
@@ -14,8 +17,17 @@ var _current_width := 2.0
 var _show_demos := true
 
 
-# ── 生命周期 ────────────────────────────────────────────
+# --------------------------------------------------
+# 生命周期
+# --------------------------------------------------
 func _ready() -> void:
+  # Retina DPI 适配
+  var dpi_scale := DisplayServer.screen_get_max_scale()
+  get_window().size = Vector2i(DESIGN_WIDTH * dpi_scale, DESIGN_HEIGHT * dpi_scale)
+  get_window().content_scale_size = Vector2i(DESIGN_WIDTH, DESIGN_HEIGHT)
+  get_window().content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
+  get_window().content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
+
   $Toolbar/BackBtn.pressed.connect(_on_back_pressed)
   $Toolbar/ColorPicker.item_selected.connect(_on_color_selected)
   $Toolbar/WidthSlider.value_changed.connect(_on_width_changed)
@@ -23,7 +35,9 @@ func _ready() -> void:
   $Toolbar/DemoToggle.toggled.connect(_on_demo_toggled)
 
 
-# ── 输入处理 ────────────────────────────────────────────
+# --------------------------------------------------
+# 输入处理
+# --------------------------------------------------
 func _gui_input(event: InputEvent) -> void:
   if event is InputEventMouseButton:
     if event.button_index == MOUSE_BUTTON_LEFT:
@@ -48,7 +62,9 @@ func _gui_input(event: InputEvent) -> void:
     queue_redraw()
 
 
-# ── 绘制 ────────────────────────────────────────────────
+# --------------------------------------------------
+# 绘制
+# --------------------------------------------------
 func _draw() -> void:
   _draw_grid()
 
@@ -62,7 +78,9 @@ func _draw() -> void:
     _draw_demos()
 
 
-# ── 公开访问器（供测试使用）────────────────────────────
+# --------------------------------------------------
+# 公开访问器（供测试使用）
+# --------------------------------------------------
 func get_current_color() -> Color:
   return _current_color
 
@@ -79,7 +97,9 @@ func is_demo_visible() -> bool:
   return _show_demos
 
 
-# ── 信号回调 ────────────────────────────────────────────
+# --------------------------------------------------
+# 信号回调
+# --------------------------------------------------
 func _on_back_pressed() -> void:
   get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 
@@ -105,7 +125,9 @@ func _on_demo_toggled(pressed: bool) -> void:
   queue_redraw()
 
 
-# ── 内部方法 ────────────────────────────────────────────
+# --------------------------------------------------
+# 内部方法
+# --------------------------------------------------
 func _draw_grid() -> void:
   var grid_spacing := 40.0
   var grid_color := Color(0.25, 0.25, 0.25, 0.4)
