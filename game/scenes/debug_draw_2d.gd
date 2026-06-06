@@ -112,7 +112,7 @@ func _on_color_selected(idx: int) -> void:
 
 func _on_width_changed(value: float) -> void:
   _current_width = value
-  $Toolbar/WidthLabel.text = "宽:%.0f" % value
+  $Toolbar/WidthLabel.text = "Width: %02.0f" % value
 
 
 func _on_clear_pressed() -> void:
@@ -149,7 +149,7 @@ func _draw_line_segment(points: PackedVector2Array, color: Color, width: float) 
 
 
 func _draw_demos() -> void:
-  var o := Vector2(60, 420)
+  var o := Vector2(60, $Toolbar.size.y + 16)
   var gap := 85.0
   var font := ThemeDB.fallback_font
 
