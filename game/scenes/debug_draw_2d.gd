@@ -7,6 +7,7 @@ const DESIGN_WIDTH := 1280
 const DESIGN_HEIGHT := 720
 const GRID_SPACING := 10.0
 const GRID_COLOR := Color(0.3, 0.3, 0.3, 0.5)
+const GRID_COLOR_MIDDLE := Color.BLACK
 const GRID_COLOR_MAJOR := Color(0.4, 0.4, 0.4, 0.7)
 const GRID_LOD_STEP := 10.0
 const GRID_LOD_MIN_PIXELS := 4.0
@@ -160,13 +161,21 @@ func _draw_grid() -> void:
   var lod0_color := GRID_COLOR
   lod0_color.a *= 1.0 - lod_fade
   var lod1_color := GRID_COLOR_MAJOR.lerp(GRID_COLOR, lod_fade)
+  var lod1_middle_color := GRID_COLOR_MIDDLE
+  lod1_middle_color.a = lod1_color.a
 
   _draw_grid_level(bounds, lod0_spacing, lod0_color, line_width)
   _draw_grid_level(bounds, lod1_spacing, lod1_color, line_width)
+  # lod1 相对上一级 lod2 的中线：每个 lod2 大格内部第 5 条 lod1 线。
+  _draw_grid_level_with_offset(bounds, lod2_spacing, lod2_spacing * 0.5, lod1_middle_color, line_width)
   _draw_grid_level(bounds, lod2_spacing, GRID_COLOR_MAJOR, line_width)
 
 
 func _draw_grid_level(bounds: Rect2, spacing: float, color: Color, line_width: float) -> void:
+  _draw_grid_level_with_offset(bounds, spacing, 0.0, color, line_width)
+
+
+func _draw_grid_level_with_offset(bounds: Rect2, spacing: float, offset: float, color: Color, line_width: float) -> void:
   if spacing <= 0.0 or color.a <= 0.001:
     return
 
@@ -175,12 +184,12 @@ func _draw_grid_level(bounds: Rect2, spacing: float, color: Color, line_width: f
   var top := bounds.position.y
   var bottom := bounds.end.y
 
-  var x: float = floor(left / spacing) * spacing
+  var x: float = floor((left - offset) / spacing) * spacing + offset
   while x <= right:
     draw_line(Vector2(x, top), Vector2(x, bottom), color, line_width, true)
     x += spacing
 
-  var y: float = floor(top / spacing) * spacing
+  var y: float = floor((top - offset) / spacing) * spacing + offset
   while y <= bottom:
     draw_line(Vector2(left, y), Vector2(right, y), color, line_width, true)
     y += spacing
