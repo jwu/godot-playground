@@ -11,7 +11,7 @@ const PANEL_SIZE := Vector2(640, 218)
 var _normal_style := StyleBoxFlat.new()
 var _pressed_style := StyleBoxFlat.new()
 var _panel_style := StyleBoxFlat.new()
-var _key_nodes: Dictionary = {}
+var _key_nodes: Dictionary = { }
 
 
 func _ready() -> void:
@@ -145,19 +145,78 @@ func _build_layout() -> void:
 func _get_keyboard_rows() -> Array:
   return [
     [
-      _key(KEY_ESCAPE, "Esc", 1.2), _key(KEY_QUOTELEFT, "`"), _key(KEY_1, "1"), _key(KEY_2, "2"), _key(KEY_3, "3"), _key(KEY_4, "4"), _key(KEY_5, "5"), _key(KEY_6, "6"), _key(KEY_7, "7"), _key(KEY_8, "8"), _key(KEY_9, "9"), _key(KEY_0, "0"), _key(KEY_MINUS, "-"), _key(KEY_EQUAL, "="), _key(KEY_BACKSPACE, "⌫", 1.8),
+      _key(KEY_ESCAPE, "Esc", 1.2),
+      _key(KEY_QUOTELEFT, "`"),
+      _key(KEY_1, "1"),
+      _key(KEY_2, "2"),
+      _key(KEY_3, "3"),
+      _key(KEY_4, "4"),
+      _key(KEY_5, "5"),
+      _key(KEY_6, "6"),
+      _key(KEY_7, "7"),
+      _key(KEY_8, "8"),
+      _key(KEY_9, "9"),
+      _key(KEY_0, "0"),
+      _key(KEY_MINUS, "-"),
+      _key(KEY_EQUAL, "="),
+      _key(KEY_BACKSPACE, "⌫", 1.8),
     ],
     [
-      _key(KEY_TAB, "Tab", 1.5), _key(KEY_Q, "Q"), _key(KEY_W, "W"), _key(KEY_E, "E"), _key(KEY_R, "R"), _key(KEY_T, "T"), _key(KEY_Y, "Y"), _key(KEY_U, "U"), _key(KEY_I, "I"), _key(KEY_O, "O"), _key(KEY_P, "P"), _key(KEY_BRACKETLEFT, "["), _key(KEY_BRACKETRIGHT, "]"), _key(KEY_BACKSLASH, "\\"),
+      _key(KEY_TAB, "Tab", 1.5),
+      _key(KEY_Q, "Q"),
+      _key(KEY_W, "W"),
+      _key(KEY_E, "E"),
+      _key(KEY_R, "R"),
+      _key(KEY_T, "T"),
+      _key(KEY_Y, "Y"),
+      _key(KEY_U, "U"),
+      _key(KEY_I, "I"),
+      _key(KEY_O, "O"),
+      _key(KEY_P, "P"),
+      _key(KEY_BRACKETLEFT, "["),
+      _key(KEY_BRACKETRIGHT, "]"),
+      _key(KEY_BACKSLASH, "\\"),
     ],
     [
-      _key(KEY_CAPSLOCK, "Caps", 1.8), _key(KEY_A, "A"), _key(KEY_S, "S"), _key(KEY_D, "D"), _key(KEY_F, "F"), _key(KEY_G, "G"), _key(KEY_H, "H"), _key(KEY_J, "J"), _key(KEY_K, "K"), _key(KEY_L, "L"), _key(KEY_SEMICOLON, ";"), _key(KEY_APOSTROPHE, "'"), _key(KEY_ENTER, "Enter", 2.0),
+      _key(KEY_CAPSLOCK, "Caps", 1.8),
+      _key(KEY_A, "A"),
+      _key(KEY_S, "S"),
+      _key(KEY_D, "D"),
+      _key(KEY_F, "F"),
+      _key(KEY_G, "G"),
+      _key(KEY_H, "H"),
+      _key(KEY_J, "J"),
+      _key(KEY_K, "K"),
+      _key(KEY_L, "L"),
+      _key(KEY_SEMICOLON, ";"),
+      _key(KEY_APOSTROPHE, "'"),
+      _key(KEY_ENTER, "Enter", 2.0),
     ],
     [
-      _key(KEY_SHIFT, "Shift", 2.2), _key(KEY_Z, "Z"), _key(KEY_X, "X"), _key(KEY_C, "C"), _key(KEY_V, "V"), _key(KEY_B, "B"), _key(KEY_N, "N"), _key(KEY_M, "M"), _key(KEY_COMMA, ","), _key(KEY_PERIOD, "."), _key(KEY_SLASH, "/"), _key(KEY_SHIFT, "Shift", 2.2),
+      _key(KEY_SHIFT, "Shift", 2.2),
+      _key(KEY_Z, "Z"),
+      _key(KEY_X, "X"),
+      _key(KEY_C, "C"),
+      _key(KEY_V, "V"),
+      _key(KEY_B, "B"),
+      _key(KEY_N, "N"),
+      _key(KEY_M, "M"),
+      _key(KEY_COMMA, ","),
+      _key(KEY_PERIOD, "."),
+      _key(KEY_SLASH, "/"),
+      _key(KEY_SHIFT, "Shift", 2.2),
     ],
     [
-      _key(KEY_CTRL, "Ctrl", 1.3), _key(KEY_ALT, "Alt", 1.3), _key(KEY_META, "Cmd", 1.3), _key(KEY_SPACE, "Space", 5.0), _key(KEY_META, "Cmd", 1.3), _key(KEY_ALT, "Alt", 1.3), _key(KEY_LEFT, "←"), _key(KEY_UP, "↑"), _key(KEY_DOWN, "↓"), _key(KEY_RIGHT, "→"),
+      _key(KEY_CTRL, "Ctrl", 1.3),
+      _key(KEY_ALT, "Alt", 1.3),
+      _key(KEY_META, "Cmd", 1.3),
+      _key(KEY_SPACE, "Space", 5.0),
+      _key(KEY_META, "Cmd", 1.3),
+      _key(KEY_ALT, "Alt", 1.3),
+      _key(KEY_LEFT, "←"),
+      _key(KEY_UP, "↑"),
+      _key(KEY_DOWN, "↓"),
+      _key(KEY_RIGHT, "→"),
     ],
   ]
 
