@@ -18,6 +18,7 @@ func _ready() -> void:
 
   $VBoxContainer/SampleTestBtn.pressed.connect(_on_sample_test_pressed)
   $VBoxContainer/DebugDraw2DBtn.pressed.connect(_on_debug_draw_2d_pressed)
+  $VBoxContainer/DebugInputBtn.pressed.connect(_on_debug_input_pressed)
   $VBoxContainer/QuitBtn.pressed.connect(_on_quit_pressed)
   _update_size_display()
   get_tree().root.size_changed.connect(_update_size_display)
@@ -37,6 +38,10 @@ func _on_sample_test_pressed() -> void:
 
 func _on_debug_draw_2d_pressed() -> void:
   get_tree().change_scene_to_file("res://scenes/debug_draw_2d.tscn")
+
+
+func _on_debug_input_pressed() -> void:
+  get_tree().change_scene_to_file("res://scenes/debug_input.tscn")
 
 
 func _on_quit_pressed() -> void:
