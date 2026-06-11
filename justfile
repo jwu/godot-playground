@@ -70,7 +70,8 @@ lint *files='':
 
 # 完整检查（无参=全项目，有参=指定文件）
 check *files='':
-  @if [ "{{files}}" = "" ]; then \
+  @set -e; \
+  if [ "{{files}}" = "" ]; then \
     _gd=$(find game -name "*.gd" -not -path "game/addons/*"); \
     echo "$_gd" | xargs gdscript-formatter --use-spaces --indent-size 2 --reorder-code --check; \
     echo "$_gd" | xargs gdscript-formatter lint --disable max-line-length; \

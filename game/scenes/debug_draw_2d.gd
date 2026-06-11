@@ -16,9 +16,9 @@ const PAN_ZOOM_MAX_STEPS := 6.0
 const MIN_ZOOM := 0.05
 const MAX_ZOOM := 100.0
 
-@onready var _zoom_label: Label = $UI/ZoomLabel as Label
-
 var _last_displayed_zoom := -1.0
+
+@onready var _zoom_label: Label = $UI/ZoomLabel as Label
 
 
 func _ready() -> void:
@@ -98,7 +98,7 @@ func _draw_grid() -> void:
 
   var bounds := Rect2(
     cam_pos - vp_size / 2.0,
-    vp_size
+    vp_size,
   )
 
   # 参考 The Machinery 的 grid renderer：根据屏幕像素密度自动切换 10 倍 LOD。
@@ -538,29 +538,35 @@ func _draw_primitive_demos(origin: Vector2) -> void:
 
 
 func _make_polyline_points(origin: Vector2) -> PackedVector2Array:
-  return PackedVector2Array([
-    origin,
-    origin + Vector2(30.0, -40.0),
-    origin + Vector2(65.0, 0.0),
-    origin + Vector2(100.0, -40.0),
-  ])
+  return PackedVector2Array(
+    [
+      origin,
+      origin + Vector2(30.0, -40.0),
+      origin + Vector2(65.0, 0.0),
+      origin + Vector2(100.0, -40.0),
+    ],
+  )
 
 
 func _make_multiline_points(origin: Vector2) -> PackedVector2Array:
-  return PackedVector2Array([
-    origin,
-    origin + Vector2(45.0, -40.0),
-    origin + Vector2(55.0, 0.0),
-    origin + Vector2(100.0, -40.0),
-  ])
+  return PackedVector2Array(
+    [
+      origin,
+      origin + Vector2(45.0, -40.0),
+      origin + Vector2(55.0, 0.0),
+      origin + Vector2(100.0, -40.0),
+    ],
+  )
 
 
 func _make_triangle_points(origin: Vector2) -> PackedVector2Array:
-  return PackedVector2Array([
-    origin + Vector2(45.0, 0.0),
-    origin + Vector2(0.0, 52.0),
-    origin + Vector2(90.0, 52.0),
-  ])
+  return PackedVector2Array(
+    [
+      origin + Vector2(45.0, 0.0),
+      origin + Vector2(0.0, 52.0),
+      origin + Vector2(90.0, 52.0),
+    ],
+  )
 
 
 func _make_closed_triangle_points(origin: Vector2) -> PackedVector2Array:
@@ -570,12 +576,14 @@ func _make_closed_triangle_points(origin: Vector2) -> PackedVector2Array:
 
 
 func _make_quad_points(origin: Vector2) -> PackedVector2Array:
-  return PackedVector2Array([
-    origin + Vector2(10.0, 4.0),
-    origin + Vector2(88.0, 12.0),
-    origin + Vector2(76.0, 54.0),
-    origin + Vector2(0.0, 46.0),
-  ])
+  return PackedVector2Array(
+    [
+      origin + Vector2(10.0, 4.0),
+      origin + Vector2(88.0, 12.0),
+      origin + Vector2(76.0, 54.0),
+      origin + Vector2(0.0, 46.0),
+    ],
+  )
 
 
 func _make_closed_quad_points(origin: Vector2) -> PackedVector2Array:
@@ -585,16 +593,20 @@ func _make_closed_quad_points(origin: Vector2) -> PackedVector2Array:
 
 
 func _make_demo_colors() -> PackedColorArray:
-  return PackedColorArray([
-    Color.RED,
-    Color.YELLOW,
-    Color.GREEN,
-    Color.CYAN,
-  ])
+  return PackedColorArray(
+    [
+      Color.RED,
+      Color.YELLOW,
+      Color.GREEN,
+      Color.CYAN,
+    ],
+  )
 
 
 func _make_multiline_demo_colors() -> PackedColorArray:
-  return PackedColorArray([
-    Color.ORANGE,
-    Color.CYAN,
-  ])
+  return PackedColorArray(
+    [
+      Color.ORANGE,
+      Color.CYAN,
+    ],
+  )
