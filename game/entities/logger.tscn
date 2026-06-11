@@ -21,19 +21,20 @@ corner_radius_bottom_left = 8
 [sub_resource type="LabelSettings" id="LabelSettings_nikuh"]
 font_size = 30
 
-[node name="Logger" type="VBoxContainer" unique_id=471495112]
-custom_minimum_size = Vector2(360, 160)
+[node name="Logger" type="Control" unique_id=471495112]
 offset_right = 360.0
 offset_bottom = 160.0
 mouse_filter = 2
-theme_override_constants/separation = 0
-alignment = 2
+clip_contents = true
 script = ExtResource("1")
 
 [node name="EditorPlaceholder" type="PanelContainer" parent="." unique_id=481731520]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_editor_placeholder")
 

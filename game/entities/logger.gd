@@ -1,7 +1,8 @@
-extends VBoxContainer
-## Logger：从下往上显示日志，并根据自身矩形高度自动控制可见条数和透明度。
+extends Control
+## Logger：在固定矩形内从下往上显示日志。
 ##
-## 调用 log(message) 记录一条日志。最新日志显示在最下方且不透明，越靠上越透明。
+## 调用 log(message) 记录一条日志。文字会被 Logger 自身矩形裁剪；
+## 最新日志显示在最下方且不透明，越靠近矩形顶部越透明。
 
 @export var max_stored_lines: int = 200
 @export var log_font_size: int = 13
@@ -13,8 +14,7 @@ var _events: Array[String] = []
 
 func _ready() -> void:
   mouse_filter = Control.MOUSE_FILTER_IGNORE
-  alignment = BoxContainer.ALIGNMENT_END
-  add_theme_constant_override("separation", 0)
+  clip_contents = true
 
   resized.connect(_update_log_display)
   _update_log_display.call_deferred()
@@ -23,7 +23,7 @@ func _ready() -> void:
 func log(message: String) -> void:
   _events.push_front(message)
 
-  var max_stored_count: int = max(max_stored_lines, _get_visible_log_count())
+  var max_stored_count: int = max(max_stored_lines, _get_render_log_count())
   if _events.size() > max_stored_count:
     _events.resize(max_stored_count)
 
@@ -40,31 +40,39 @@ func _update_log_display() -> void:
     remove_child(child)
     child.queue_free()
 
-  var visible_count: int = min(_events.size(), _get_visible_log_count())
-  if visible_count <= 0:
+  var render_count: int = min(_events.size(), _get_render_log_count())
+  if render_count <= 0:
     return
 
-  # _events[0] 是最新日志。为了让日志从下往上增长，这里按「旧 -> 新」添加节点。
-  for event_index: int in range(visible_count - 1, -1, -1):
-    var display_index: int = visible_count - 1 - event_index
-    var alpha: float = 1.0 if visible_count == 1 else float(display_index) / float(visible_count - 1)
+  var rect_size := size
+  var line_height := float(_get_log_line_height())
+
+  # _events[0] 是最新日志。这里按「旧 -> 新」添加节点，使最新日志位于底部。
+  # 节点使用绝对位置，不参与 Container 布局，避免文字数量反过来撑大 Logger 矩形。
+  for event_index: int in range(render_count - 1, -1, -1):
+    var display_index: int = render_count - 1 - event_index
+    var y := rect_size.y - float(render_count - display_index) * line_height
+    var alpha := clampf((y + line_height) / maxf(rect_size.y, 1.0), 0.0, 1.0)
 
     var log_label := Label.new()
     log_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    log_label.clip_text = true
     log_label.text = _events[event_index]
+    log_label.position = Vector2(0.0, y)
+    log_label.size = Vector2(rect_size.x, line_height)
     log_label.modulate = Color(1.0, 1.0, 1.0, alpha)
-    log_label.custom_minimum_size.y = _get_log_line_height()
     log_label.add_theme_font_size_override("font_size", log_font_size)
     log_label.add_theme_color_override("font_color", log_color)
     add_child(log_label)
 
 
-func _get_visible_log_count() -> int:
-  var rect_height := get_rect().size.y
+func _get_render_log_count() -> int:
+  var rect_height := size.y
   if rect_height <= 0.0:
     return 0
 
-  return max(1, int(floor(rect_height / float(_get_log_line_height()))))
+  # 使用 ceil 多渲染顶部可能被截断的一行，让 clip_contents 负责裁剪。
+  return max(1, int(ceil(rect_height / float(_get_log_line_height()))))
 
 
 func _get_log_line_height() -> int:
