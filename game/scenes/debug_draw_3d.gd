@@ -1,27 +1,17 @@
 extends Node3D
-## DebugDraw3D：3D 调试绘制演示，轨道相机 + ImmediateMesh 动态绘制
+## DebugDraw3D：3D 调试绘制演示，FreeCamera + ImmediateMesh 动态绘制
 ##
-## 右键拖拽旋转，滚轮/触控板缩放，中键拖拽平移，Esc 返回主菜单。
+## 相机操作由 res://entities/free_camera.tscn 提供。
+## Esc 在 Freelook 中退出 Freelook，否则返回主菜单。
 ## 展示：坐标轴、XZ 网格(LOD)、3D 线段、线框图元、点标记、方向射线。
 
 const DESIGN_WIDTH := 1280
 const DESIGN_HEIGHT := 720
-const ORBIT_SENSITIVITY := 0.004
-const PAN_FACTOR := 0.005
-const ZOOM_FACTOR := 1.08
-const PAN_ZOOM_MAX_STEPS := 6.0
-const MIN_DISTANCE := 0.5
-const MAX_DISTANCE := 300.0
-const DEFAULT_DISTANCE := 16.0
 const GRID_HALF := 30
 
-var _yaw := -PI * 0.25
-var _pitch := PI * 0.28
-var _distance := DEFAULT_DISTANCE
-var _target := Vector3.ZERO
 var _last_info_text := ""
 
-@onready var _camera: Camera3D = $Camera3D
+@onready var _free_camera: FreeCamera = $FreeCamera
 @onready var _info_label: Label = $UI/InfoLabel
 @onready var _mesh_instance: MeshInstance3D = $DrawMesh
 
@@ -34,7 +24,6 @@ func _ready() -> void:
   get_window().content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
 
   _mesh_instance.mesh = ImmediateMesh.new()
-  _update_camera()
 
 
 func _process(_delta: float) -> void:
@@ -44,57 +33,14 @@ func _process(_delta: float) -> void:
 
 func _input(event: InputEvent) -> void:
   if event.is_action_pressed(&"ui_cancel"):
-    get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
-    return
-
-  # 滚轮缩放
-  if event is InputEventMouseButton:
-    if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-      _distance = clampf(_distance / ZOOM_FACTOR, MIN_DISTANCE, MAX_DISTANCE)
-      _update_camera()
-    elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-      _distance = clampf(_distance * ZOOM_FACTOR, MIN_DISTANCE, MAX_DISTANCE)
-      _update_camera()
-
-  # 右键拖拽旋转
-  if event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
-    _yaw -= event.relative.x * ORBIT_SENSITIVITY
-    _pitch = clampf(_pitch - event.relative.y * ORBIT_SENSITIVITY, 0.05, PI - 0.05)
-    _update_camera()
-
-  # 中键拖拽平移
-  if event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE):
-    var right := _camera.global_transform.basis.x
-    var up := _camera.global_transform.basis.y
-    _target -= (right * event.relative.x + up * event.relative.y) * PAN_FACTOR * _distance * 0.01
-    _update_camera()
-
-  # Mac 触控板双指纵向滑动 → 缩放
-  if event is InputEventPanGesture:
-    var steps := clampf(event.delta.y, -PAN_ZOOM_MAX_STEPS, PAN_ZOOM_MAX_STEPS)
-    if not is_zero_approx(steps):
-      _distance = clampf(_distance * pow(ZOOM_FACTOR, steps), MIN_DISTANCE, MAX_DISTANCE)
-      _update_camera()
-
-
-func _update_camera() -> void:
-  _camera.position = _target + Vector3(
-    _distance * cos(_pitch) * cos(_yaw),
-    _distance * sin(_pitch),
-    _distance * cos(_pitch) * sin(_yaw),
-  )
-  _camera.look_at(_target)
+    if _free_camera.is_freelook_active():
+      _free_camera.set_freelook_active(false)
+    else:
+      get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 
 
 func _update_info_label() -> void:
-  var text := "Camera  Dist: %.1f  Yaw: %.0f°  Pitch: %.0f°  Target: (%.1f, %.1f, %.1f)" % [
-    _distance,
-    rad_to_deg(_yaw),
-    rad_to_deg(_pitch),
-    _target.x,
-    _target.y,
-    _target.z,
-  ]
+  var text := _free_camera.get_info_text()
   if text != _last_info_text:
     _info_label.text = text
     _last_info_text = text
