@@ -5,6 +5,7 @@ uniform float grid_size = 2000.0;
 uniform float cell_size = 1.0;
 uniform float min_pixels_between_cells = 2.0;
 uniform float line_width_pixels = 2.0;
+uniform bool enable_grazing_opacity = true;
 uniform vec4 thin_line_color : source_color = vec4(0.25, 0.25, 0.25, 0.45);
 uniform vec4 thick_line_color : source_color = vec4(0.38, 0.38, 0.38, 0.75);
 
@@ -17,11 +18,12 @@ void vertex() {
 
 
 float grid_line_alpha(vec2 uv, float current_cell_size, vec2 dudv) {
-	vec2 cell = uv / current_cell_size;
-	vec2 cell_dudv = max(dudv / current_cell_size, vec2(0.00001));
-	vec2 dist_to_line = abs(fract(cell - 0.5) - 0.5);
-	vec2 line_width = max(cell_dudv * line_width_pixels, vec2(0.00001));
-	vec2 coverage = 1.0 - clamp(dist_to_line / line_width, vec2(0.0), vec2(1.0));
+	// 贴近 The Machinery：用 grid-space 导数作为屏幕空间线宽，
+	// 再通过 mod() 构造每个 cell 边界附近的 coverage alpha。
+	vec2 line_width = max(dudv * line_width_pixels, vec2(0.00001));
+	vec2 coverage = 1.0 - abs(
+		clamp(mod(uv, vec2(current_cell_size)) / line_width, vec2(0.0), vec2(1.0)) * 2.0 - 1.0
+	);
 	return max(coverage.x, coverage.y);
 }
 
@@ -60,8 +62,11 @@ void fragment() {
 
 	float half_grid_size = max(grid_size * 0.5, 0.00001);
 	float distance_opacity = 1.0 - clamp(length(world_position.xz - CAMERA_POSITION_WORLD.xz) / half_grid_size, 0.0, 1.0);
-	vec3 view_dir = normalize(CAMERA_POSITION_WORLD - world_position);
-	float grazing_opacity = 1.0 - pow(1.0 - abs(dot(view_dir, vec3(0.0, 1.0, 0.0))), 16.0);
+	float grazing_opacity = 1.0;
+	if (enable_grazing_opacity) {
+		vec3 view_dir = normalize(CAMERA_POSITION_WORLD - world_position);
+		grazing_opacity = 1.0 - pow(1.0 - abs(dot(view_dir, vec3(0.0, 1.0, 0.0))), 16.0);
+	}
 
 	ALBEDO = line_color.rgb;
 	ALPHA = line_color.a * line_alpha * distance_opacity * grazing_opacity;

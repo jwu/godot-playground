@@ -154,11 +154,12 @@ float lod2_cell_size = lod1_cell_size * 10.0;
 
 ```glsl
 float grid_line_alpha(vec2 uv, float current_cell_size, vec2 dudv) {
-  vec2 cell = uv / current_cell_size;
-  vec2 cell_dudv = max(dudv / current_cell_size, vec2(0.00001));
-  vec2 dist_to_line = abs(fract(cell - 0.5) - 0.5);
-  vec2 line_width = max(cell_dudv * line_width_pixels, vec2(0.00001));
-  vec2 coverage = 1.0 - clamp(dist_to_line / line_width, vec2(0.0), vec2(1.0));
+  // 贴近 The Machinery：用 grid-space 导数作为屏幕空间线宽，
+  // 再通过 mod() 构造每个 cell 边界附近的 coverage alpha。
+  vec2 line_width = max(dudv * line_width_pixels, vec2(0.00001));
+  vec2 coverage = 1.0 - abs(
+    clamp(mod(uv, vec2(current_cell_size)) / line_width, vec2(0.0), vec2(1.0)) * 2.0 - 1.0
+  );
   return max(coverage.x, coverage.y);
 }
 ```
@@ -190,11 +191,14 @@ float distance_opacity = 1.0 - clamp(
 视线越贴近平面，网格越透明：
 
 ```glsl
-vec3 view_dir = normalize(CAMERA_POSITION_WORLD - world_position);
-float grazing_opacity = 1.0 - pow(1.0 - abs(dot(view_dir, vec3(0.0, 1.0, 0.0))), 16.0);
+float grazing_opacity = 1.0;
+if (enable_grazing_opacity) {
+  vec3 view_dir = normalize(CAMERA_POSITION_WORLD - world_position);
+  grazing_opacity = 1.0 - pow(1.0 - abs(dot(view_dir, vec3(0.0, 1.0, 0.0))), 16.0);
+}
 ```
 
-这可以减少贴地视角下远处网格的视觉噪声。
+这可以减少贴地视角下远处网格的视觉噪声。需要对比 OGLDEV 基础版时，可以关闭 `enable_grazing_opacity`。
 
 ## 导出参数
 
@@ -207,8 +211,9 @@ float grazing_opacity = 1.0 - pow(1.0 - abs(dot(view_dir, vec3(0.0, 1.0, 0.0))),
 | `cell_size` | `1.0` | 基础 cell 大小 |
 | `min_pixels_between_cells` | `2.0` | LOD 切换使用的最小像素间距 |
 | `line_width_pixels` | `2.0` | 网格线屏幕空间宽度倍率 |
-| `thin_line_color` | `(0.25, 0.25, 0.25, 0.45)` | 细线颜色 |
-| `thick_line_color` | `(0.38, 0.38, 0.38, 0.75)` | 粗线颜色 |
+| `enable_grazing_opacity` | `true` | 是否启用低角度渐隐 |
+| `thin_line_color` | `(0.3, 0.3, 0.3, 0.5)` | 细线颜色 |
+| `thick_line_color` | `(0.4, 0.4, 0.4, 0.7)` | 粗线颜色 |
 
 ## 在场景中使用
 

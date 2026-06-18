@@ -28,6 +28,7 @@ func test_scene_creates_shader_material() -> void:
   assert_object(material.shader).is_not_null()
   assert_float(float(material.get_shader_parameter("grid_size"))).is_greater(0.0)
   assert_float(float(material.get_shader_parameter("cell_size"))).is_greater(0.0)
+  assert_bool(bool(material.get_shader_parameter("enable_grazing_opacity"))).is_true()
 
 
 func test_follow_camera_locks_grid_to_camera_xz() -> void:

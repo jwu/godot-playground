@@ -11,8 +11,9 @@ const GRID_SHADER := preload("res://entities/endless_grid_3d.gdshader")
 @export var cell_size := 1.0
 @export var min_pixels_between_cells := 2.0
 @export var line_width_pixels := 2.0
-@export var thin_line_color := Color(0.25, 0.25, 0.25, 0.45)
-@export var thick_line_color := Color(0.38, 0.38, 0.38, 0.75)
+@export var enable_grazing_opacity := true
+@export var thin_line_color := Color(0.3, 0.3, 0.3, 0.5)
+@export var thick_line_color := Color(0.4, 0.4, 0.4, 0.7)
 
 var _shader_material: ShaderMaterial
 
@@ -89,5 +90,6 @@ func _apply_shader_parameters() -> void:
   _shader_material.set_shader_parameter("cell_size", cell_size)
   _shader_material.set_shader_parameter("min_pixels_between_cells", min_pixels_between_cells)
   _shader_material.set_shader_parameter("line_width_pixels", line_width_pixels)
+  _shader_material.set_shader_parameter("enable_grazing_opacity", enable_grazing_opacity)
   _shader_material.set_shader_parameter("thin_line_color", thin_line_color)
   _shader_material.set_shader_parameter("thick_line_color", thick_line_color)
