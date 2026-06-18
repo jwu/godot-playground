@@ -34,6 +34,10 @@ text = "Sample Test"
 layout_mode = 2
 text = "DebugDraw 2D"
 
+[node name="DebugDraw3DBtn" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "DebugDraw 3D"
+
 [node name="DebugInputBtn" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "Debug Input"
