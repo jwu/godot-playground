@@ -6,7 +6,6 @@ extends Node3D
 
 const DESIGN_WIDTH := 1280
 const DESIGN_HEIGHT := 720
-const ENDLESS_GRID_3D_SCENE := preload("res://entities/endless_grid_3d.tscn")
 const ORBIT_SENSITIVITY := 0.004
 const PAN_FACTOR := 0.005
 const ZOOM_FACTOR := 1.08
@@ -35,7 +34,6 @@ func _ready() -> void:
   get_window().content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
 
   _mesh_instance.mesh = ImmediateMesh.new()
-  _setup_endless_grid()
   _update_camera()
 
 
@@ -86,14 +84,6 @@ func _update_camera() -> void:
     _distance * cos(_pitch) * sin(_yaw),
   )
   _camera.look_at(_target)
-
-
-func _setup_endless_grid() -> void:
-  var endless_grid := ENDLESS_GRID_3D_SCENE.instantiate() as Node3D
-  endless_grid.name = "EndlessGrid3D"
-  add_child(endless_grid)
-  if endless_grid.has_method("follow_camera"):
-    endless_grid.call("follow_camera", _camera)
 
 
 func _update_info_label() -> void:

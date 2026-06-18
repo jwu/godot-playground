@@ -46,7 +46,7 @@ func test_draw_mesh_uses_vertex_color_unshaded_material() -> void:
   assert_int(material.transparency).is_equal(BaseMaterial3D.TRANSPARENCY_ALPHA)
 
 
-func test_ready_instantiates_endless_grid_entity() -> void:
+func test_scene_includes_endless_grid_entity() -> void:
   var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
   add_child(scene)
   await get_tree().process_frame

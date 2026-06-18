@@ -17,9 +17,10 @@ void vertex() {
 
 
 float grid_line_alpha(vec2 uv, float current_cell_size, vec2 dudv) {
-	vec2 local = mod(uv, vec2(current_cell_size));
-	vec2 dist_to_line = min(local, vec2(current_cell_size) - local);
-	vec2 line_width = max(dudv * line_width_pixels, vec2(0.00001));
+	vec2 cell = uv / current_cell_size;
+	vec2 cell_dudv = max(dudv / current_cell_size, vec2(0.00001));
+	vec2 dist_to_line = abs(fract(cell - 0.5) - 0.5);
+	vec2 line_width = max(cell_dudv * line_width_pixels, vec2(0.00001));
 	vec2 coverage = 1.0 - clamp(dist_to_line / line_width, vec2(0.0), vec2(1.0));
 	return max(coverage.x, coverage.y);
 }
