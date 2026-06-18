@@ -23,7 +23,7 @@ var _last_displayed_zoom := -1.0
 
 func _ready() -> void:
   var dpi_scale := DisplayServer.screen_get_max_scale()
-  get_window().size = Vector2i(DESIGN_WIDTH * dpi_scale, DESIGN_HEIGHT * dpi_scale)
+  get_window().size = Vector2i(roundi(DESIGN_WIDTH * dpi_scale), roundi(DESIGN_HEIGHT * dpi_scale))
   get_window().content_scale_size = Vector2i(DESIGN_WIDTH, DESIGN_HEIGHT)
   get_window().content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
   get_window().content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
@@ -45,12 +45,12 @@ func _input(event: InputEvent) -> void:
     get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
     return
 
-  # 滚轮缩放
+  # 滚轮缩放（向上缩小，向下放大）
   if event is InputEventMouseButton:
     if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-      _zoom_at(event.position, 1.1)
-    elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
       _zoom_at(event.position, 1.0 / 1.1)
+    elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+      _zoom_at(event.position, 1.1)
 
   # 左键/中键拖拽平移
   if event is InputEventMouseMotion and (
@@ -60,9 +60,9 @@ func _input(event: InputEvent) -> void:
     $Camera2D.position -= event.relative / $Camera2D.zoom
     queue_redraw()
 
-  # Mac 触控板双指纵向滑动 → 缩放
+  # Mac 触控板双指纵向滑动 → 缩放（向下放大，向上缩小）
   if event is InputEventPanGesture:
-    var zoom_steps := clampf(-event.delta.y, -PAN_ZOOM_MAX_STEPS, PAN_ZOOM_MAX_STEPS)
+    var zoom_steps := clampf(event.delta.y, -PAN_ZOOM_MAX_STEPS, PAN_ZOOM_MAX_STEPS)
     if not is_zero_approx(zoom_steps):
       _zoom_at(get_viewport().get_mouse_position(), pow(PAN_ZOOM_BASE, zoom_steps))
 
@@ -167,9 +167,9 @@ func _draw_demos() -> void:
 func _draw_line_demos(origin: Vector2) -> void:
   var gap := 60.0
   var font := ThemeDB.fallback_font
-  var len := 100.0
-  var line_delta := Vector2(len, -40.0)
-  var label_offset := Vector2(len + 8, -6)
+  var line_len := 100.0
+  var line_delta := Vector2(line_len, -40.0)
+  var label_offset := Vector2(line_len + 8, -6)
   var title := "draw_line"
   var title_font_size := 16
   var o := origin + Vector2(0.0, font.get_height(title_font_size) + 28.0)
@@ -209,9 +209,9 @@ func _draw_line_demos(origin: Vector2) -> void:
 func _draw_dashed_line_demos(origin: Vector2) -> void:
   var gap := 60.0
   var font := ThemeDB.fallback_font
-  var len := 100.0
-  var line_delta := Vector2(len, -40.0)
-  var label_offset := Vector2(len + 8, -6)
+  var line_len := 100.0
+  var line_delta := Vector2(line_len, -40.0)
+  var label_offset := Vector2(line_len + 8, -6)
   var dash := 12.0
   var title := "draw_dashed_line"
   var title_font_size := 16
@@ -278,8 +278,8 @@ func _draw_dashed_line_demos(origin: Vector2) -> void:
 func _draw_polyline_demos(origin: Vector2) -> void:
   var gap := 60.0
   var font := ThemeDB.fallback_font
-  var len := 100.0
-  var label_offset := Vector2(len + 8, -6)
+  var line_len := 100.0
+  var label_offset := Vector2(line_len + 8, -6)
   var title := "draw_polyline"
   var title_font_size := 16
   var o := origin + Vector2(0.0, font.get_height(title_font_size) + 28.0)
@@ -329,8 +329,8 @@ func _draw_polyline_demos(origin: Vector2) -> void:
 func _draw_multiline_demos(origin: Vector2) -> void:
   var gap := 60.0
   var font := ThemeDB.fallback_font
-  var len := 100.0
-  var label_offset := Vector2(len + 8, -6)
+  var line_len := 100.0
+  var label_offset := Vector2(line_len + 8, -6)
   var title := "draw_multiline"
   var title_font_size := 16
   var o := origin + Vector2(0.0, font.get_height(title_font_size) + 28.0)
