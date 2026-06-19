@@ -19,11 +19,6 @@ func _ready() -> void:
   custom_minimum_size = PANEL_SIZE
   size = PANEL_SIZE
 
-  if Engine.is_editor_hint():
-    _remove_runtime_keyboard()
-    _show_editor_placeholder()
-    return
-
   _remove_editor_placeholder()
   _remove_runtime_keyboard()
   _setup_styles()
@@ -65,37 +60,6 @@ func _remove_editor_placeholder() -> void:
 
   remove_child(placeholder)
   placeholder.queue_free()
-
-
-func _show_editor_placeholder() -> void:
-  var existing_placeholder := get_node_or_null("EditorPlaceholder") as Control
-  if existing_placeholder != null:
-    existing_placeholder.visible = true
-    return
-
-  var placeholder_style := StyleBoxFlat.new()
-  placeholder_style.bg_color = Color(0.08, 0.10, 0.14, 0.78)
-  placeholder_style.border_color = Color(0.35, 0.65, 1.00, 0.70)
-  placeholder_style.set_border_width_all(2)
-  placeholder_style.set_corner_radius_all(8)
-  placeholder_style.set_content_margin_all(12)
-
-  var panel := PanelContainer.new()
-  panel.name = "EditorPlaceholder"
-  panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-  panel.anchor_right = 1.0
-  panel.anchor_bottom = 1.0
-  panel.add_theme_stylebox_override("panel", placeholder_style)
-  add_child(panel)
-
-  var label := Label.new()
-  label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-  label.text = "Keyboard Debugger\n编辑器占位显示\n运行时显示真实键盘布局"
-  label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-  label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-  label.add_theme_font_size_override("font_size", 22)
-  label.add_theme_color_override("font_color", Color(0.86, 0.94, 1.00, 1.00))
-  panel.add_child(label)
 
 
 func _setup_styles() -> void:
