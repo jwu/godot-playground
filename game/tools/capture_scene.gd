@@ -4,6 +4,7 @@ extends SceneTree
 ## 用法：godot --path game --script res://tools/capture_scene.gd
 ## 注意：截图需要真实图形后端，不要加 --headless。
 
+const CapturePng := preload("res://tools/capture_png.gd")
 const SCENE_PATH := "res://scenes/debug_draw_3d.tscn"
 const OUT_PATH := "res://reports/captures/debug_grid.png"
 const DESIGN_SIZE := Vector2i(1280, 720)
@@ -39,22 +40,4 @@ func _capture() -> int:
   for i in range(WAIT_FRAMES):
     await process_frame
 
-  var viewport_texture := root.get_texture()
-  if viewport_texture == null:
-    push_error("无法读取 viewport texture。请确认没有使用 --headless。")
-    return 1
-
-  var image := viewport_texture.get_image()
-  if image == null:
-    push_error("无法读取截图 image。请确认没有使用 --headless。")
-    return 1
-
-  var output_global := ProjectSettings.globalize_path(OUT_PATH)
-  DirAccess.make_dir_recursive_absolute(output_global.get_base_dir())
-  var save_err := image.save_png(output_global)
-  if save_err != OK:
-    push_error("保存截图失败: %s err=%s" % [OUT_PATH, save_err])
-    return 1
-
-  print("saved ", output_global)
-  return OK
+  return CapturePng.save_viewport(root, OUT_PATH)

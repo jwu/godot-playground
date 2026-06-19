@@ -10,6 +10,7 @@ extends SceneTree
 ##
 ## 注意：截图需要真实图形后端，不要加 --headless。
 
+const CapturePng := preload("res://tools/capture_png.gd")
 const SCENE_PATH := "res://scenes/debug_draw_3d.tscn"
 const OUT_DIR := "res://reports/grid_lod_capture"
 const DESIGN_WIDTH := 1280
@@ -52,25 +53,9 @@ func _capture(debug_colors: bool, file_name: String) -> int:
   for i in range(WAIT_FRAMES):
     await process_frame
 
-  var viewport_texture := root.get_texture()
-  if viewport_texture == null:
-    push_error("无法读取 viewport texture。请确认没有使用 --headless。")
-    return 1
-
-  var image := viewport_texture.get_image()
-  if image == null:
-    push_error("无法读取截图 image。请确认没有使用 --headless。")
-    return 1
-
-  var output_path := OUT_DIR.path_join(file_name)
-  var output_global := ProjectSettings.globalize_path(output_path)
-  DirAccess.make_dir_recursive_absolute(output_global.get_base_dir())
-  var save_err := image.save_png(output_global)
-  if save_err != OK:
-    push_error("保存截图失败: %s err=%s" % [output_path, save_err])
-    return 1
-
-  print("saved ", output_global)
+  var err := CapturePng.save_viewport(root, OUT_DIR.path_join(file_name))
+  if err != OK:
+    return err
 
   scene.queue_free()
   for i in range(3):
