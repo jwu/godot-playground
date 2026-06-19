@@ -2,7 +2,6 @@ extends GdUnitTestSuite
 ## DebugDraw3D 场景的单元测试
 
 const DEBUG_DRAW_3D_SCENE := preload("res://scenes/debug_draw_3d.tscn")
-const FREE_CAMERA_SCENE := preload("res://entities/free_camera.tscn")
 
 
 func test_scene_loads() -> void:
@@ -57,11 +56,3 @@ func test_scene_includes_endless_grid_entity() -> void:
   assert_object(endless_grid).is_not_null()
   assert_object(endless_grid.mesh).is_not_null()
   assert_bool(endless_grid.mesh is ArrayMesh).is_true()
-
-
-func test_free_camera_entity_is_camera() -> void:
-  var free_camera: FreeCamera = auto_free(FREE_CAMERA_SCENE.instantiate()) as FreeCamera
-
-  assert_object(free_camera).is_not_null()
-  assert_bool(free_camera is Camera3D).is_true()
-  assert_object(free_camera.get_camera()).is_same(free_camera)

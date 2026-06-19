@@ -72,10 +72,6 @@ func set_freelook_active(active: bool) -> void:
   Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if active else Input.MOUSE_MODE_VISIBLE
 
 
-func get_camera() -> Camera3D:
-  return self
-
-
 func get_info_text() -> String:
   var mode := "Freelook" if _freelook_active else "Orbit"
   return "%s  Dist: %.1f  Speed: %.1f  Yaw: %.0f°  Pitch: %.0f°  Target: (%.1f, %.1f, %.1f)" % [
@@ -204,13 +200,13 @@ func _update_freelook(delta: float) -> void:
   global_position += motion
 
 
-func _scale_distance(scale: float) -> void:
-  _distance = _clamp_editor_zoom_value(_distance * scale)
+func _scale_distance(factor: float) -> void:
+  _distance = _clamp_editor_zoom_value(_distance * factor)
   _update_camera()
 
 
-func _scale_freelook_speed(scale: float) -> void:
-  _freelook_speed = _clamp_editor_zoom_value(_freelook_speed * scale)
+func _scale_freelook_speed(factor: float) -> void:
+  _freelook_speed = _clamp_editor_zoom_value(_freelook_speed * factor)
 
 
 func _clamp_editor_zoom_value(value: float) -> float:

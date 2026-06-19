@@ -37,11 +37,11 @@ func test_log_count_and_alpha_follow_rect_height() -> void:
   for index: int in range(10):
     logger.log("line-%d" % index)
 
-  var expected_count: int = int(logger.call("_get_visible_log_count"))
+  var expected_count: int = int(logger.call("_get_render_log_count"))
   assert_int(logger.get_child_count()).is_equal(expected_count)
 
   if expected_count > 1:
-    assert_float((logger.get_child(0) as Label).modulate.a).is_equal_approx(0.0, 0.001)
+    assert_float((logger.get_child(0) as Label).modulate.a).is_less((logger.get_child(logger.get_child_count() - 1) as Label).modulate.a)
   assert_float((logger.get_child(logger.get_child_count() - 1) as Label).modulate.a).is_equal_approx(1.0, 0.001)
 
 

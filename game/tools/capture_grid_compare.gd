@@ -10,7 +10,6 @@ extends SceneTree
 ##
 ## 注意：截图需要真实图形后端，不要加 --headless。
 
-const CaptureSceneUtils := preload("res://tools/capture_scene_utils.gd")
 const SCENE_PATH := "res://scenes/debug_draw_3d.tscn"
 const OUT_DIR := "res://reports/grid_lod_capture"
 const DESIGN_WIDTH := 1280
@@ -37,15 +36,17 @@ func _capture(debug_colors: bool, file_name: String) -> int:
     return 1
 
   var scene := packed_scene.instantiate()
-  var set_expressions: Array[String] = [
-    "FreeCamera.initial_distance=0.8",
-    "FreeCamera.initial_yaw=-32deg",
-    "FreeCamera.initial_pitch=42deg",
-    "FreeCamera.initial_target=Vector3(0,0,0)",
-    "EndlessGrid3D.debug_lod_colors=%s" % ["true" if debug_colors else "false"],
-  ]
-  if not CaptureSceneUtils.apply_set_expressions(scene, set_expressions):
+  var free_camera := scene.get_node_or_null("FreeCamera") as FreeCamera
+  var grid := scene.get_node_or_null("EndlessGrid3D")
+  if free_camera == null or grid == null:
+    push_error("截图场景缺少 FreeCamera 或 EndlessGrid3D")
     return 1
+
+  free_camera.initial_distance = 0.8
+  free_camera.initial_yaw = deg_to_rad(-32.0)
+  free_camera.initial_pitch = deg_to_rad(42.0)
+  free_camera.initial_target = Vector3.ZERO
+  grid.set("debug_lod_colors", debug_colors)
 
   root.add_child(scene)
   for i in range(WAIT_FRAMES):
@@ -62,13 +63,14 @@ func _capture(debug_colors: bool, file_name: String) -> int:
     return 1
 
   var output_path := OUT_DIR.path_join(file_name)
-  CaptureSceneUtils.ensure_output_parent(output_path)
-  var save_err := image.save_png(CaptureSceneUtils.global_output_path(output_path))
+  var output_global := ProjectSettings.globalize_path(output_path)
+  DirAccess.make_dir_recursive_absolute(output_global.get_base_dir())
+  var save_err := image.save_png(output_global)
   if save_err != OK:
     push_error("保存截图失败: %s err=%s" % [output_path, save_err])
     return 1
 
-  print("saved ", CaptureSceneUtils.global_output_path(output_path))
+  print("saved ", output_global)
 
   scene.queue_free()
   for i in range(3):
