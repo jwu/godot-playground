@@ -132,6 +132,11 @@ Triage 标签使用默认的五类规范词汇。详见 `docs/agents/triage-labe
 - Git commit message 使用 Conventional Commits 格式：`type(scope): 中文描述`
 - commit message 的描述部分必须使用中文，不使用纯英文描述
 - 按改动内容分批次提交，避免把无关改动混进同一个 commit
+- 如果实现来自 GitHub Issue，并且该改动完成了对应 issue，提交前必须明确关闭策略：
+    - 直接提交到默认分支时，在 commit body 中写入 `Closes #N`；多个 issue 逐行列出
+    - 通过 PR 合并时，在 PR body 中写入对应 `Closes #N`
+    - 如果 issue 不应关闭，最终回复中必须说明原因
+- 不要默认编辑或关闭远程 issue；只有用户明确要求时才使用 `gh issue close` 等远程操作
 
 ### 严禁
 
