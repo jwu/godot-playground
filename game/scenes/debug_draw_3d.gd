@@ -103,7 +103,7 @@ func _draw_line_demos() -> void:
 
 
 func _draw_curve_demos() -> void:
-  var points := PackedVector3Array(
+  var base_points := PackedVector3Array(
     [
       Vector3(-20.0, 0.0, 6.0),
       Vector3(-16.0, 4.0, 8.0),
@@ -111,9 +111,43 @@ func _draw_curve_demos() -> void:
       Vector3(-8.0, 5.0, 10.0),
     ],
   )
-  var arrow_points := points.duplicate()
-  arrow_points.append(Vector3(-4.0, 2.0, 12.0))
-  _debug_draw.draw_curve(points, Color.CYAN, DebugDraw3DNode.CurveType.CATMULL_ROM)
+  var curve_specs: Array[Dictionary] = [
+    { type = DebugDraw3DNode.CurveType.BEZIER, offset = Vector3(0.0, 0.0, 0.0), color = Color.CYAN },
+    {
+      type = DebugDraw3DNode.CurveType.ROUND_CORNER,
+      offset = Vector3(0.0, 0.0, 4.0),
+      color = Color.LIGHT_GREEN,
+    },
+    {
+      type = DebugDraw3DNode.CurveType.CLOSED_ROUND_CORNER,
+      offset = Vector3(0.0, 0.0, 8.0),
+      color = Color.ORANGE,
+    },
+    {
+      type = DebugDraw3DNode.CurveType.CATMULL_ROM,
+      offset = Vector3(10.0, 0.0, 0.0),
+      color = Color.YELLOW,
+    },
+    {
+      type = DebugDraw3DNode.CurveType.LINES,
+      offset = Vector3(10.0, 0.0, 4.0),
+      color = Color.WHITE,
+    },
+    {
+      type = DebugDraw3DNode.CurveType.HERMITE,
+      offset = Vector3(10.0, 0.0, 8.0),
+      color = Color.MAGENTA,
+    },
+  ]
+  for spec: Dictionary in curve_specs:
+    _debug_draw.draw_curve(
+      _offset_points(base_points, spec["offset"]),
+      spec["color"],
+      int(spec["type"]),
+    )
+
+  var arrow_points := _offset_points(base_points, Vector3(0.0, 0.0, 14.0))
+  arrow_points.append(Vector3(-4.0, 2.0, 26.0))
   _debug_draw.draw_arrow_curve(
     arrow_points,
     Color.YELLOW,
@@ -121,7 +155,7 @@ func _draw_curve_demos() -> void:
     DebugDraw3DNode.ArrowPointType.PRISMATIC,
   )
   _debug_draw.draw_cylinder_curve(
-    points,
+    _offset_points(base_points, Vector3(10.0, 0.0, 14.0)),
     0.08,
     Color(0.4, 1.0, 0.6, 0.8),
     DebugDraw3DNode.CurveType.BEZIER,
@@ -239,8 +273,30 @@ func _setup_spatial_labels() -> void:
     Vector3(0.0, 8.0, 0.0),
   )
   _add_spatial_label("LinesTitle", "线段 / 折线", Vector3(-16.0, 5.0, -20.0))
+  _add_spatial_label(
+    "LineStylesLabel",
+    "draw_line\nLineStyle: DEFAULT / DASH / DOT\n别名: draw_line_3d",
+    Vector3(-22.0, 4.0, -18.0),
+  )
+  _add_spatial_label(
+    "PolylineLabel",
+    "draw_polyline\nPackedVector3Array 多段折线\n别名: draw_polyline_3d",
+    Vector3(-12.0, 6.5, -16.0),
+  )
   _add_spatial_label("CurvesTitle", "曲线 / 箭头曲线", Vector3(-13.0, 7.0, 10.0))
+  _add_spatial_label(
+    "CurveTypesLabel",
+    "draw_curve\nCurveType: BEZIER / ROUND_CORNER / CLOSED_ROUND_CORNER / CATMULL_ROM / LINES / HERMITE\n别名说明: draw_line_3d / draw_polyline_3d 仅说明不重复摆放",
+    Vector3(-10.0, 8.0, 16.0),
+  )
   _add_spatial_label("ShapesTitle", "平面与体积形状", Vector3(12.0, 7.0, -10.0))
+
+
+func _offset_points(points: PackedVector3Array, offset: Vector3) -> PackedVector3Array:
+  var result := PackedVector3Array()
+  for point: Vector3 in points:
+    result.append(point + offset)
+  return result
 
 
 func _add_spatial_label(label_name: String, text: String, label_position: Vector3) -> Label3D:

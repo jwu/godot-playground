@@ -57,6 +57,34 @@ func test_ready_creates_reusable_spatial_labels() -> void:
   assert_int(same_title_label.get_instance_id()).is_equal(title_instance_id)
 
 
+func test_line_and_curve_labels_describe_api_coverage() -> void:
+  var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
+  add_child(scene)
+  await get_tree().process_frame
+
+  var line_label: Label3D = scene.get_node_or_null("SpatialLabels/LineStylesLabel") as Label3D
+  var polyline_label: Label3D = scene.get_node_or_null("SpatialLabels/PolylineLabel") as Label3D
+  var curve_label: Label3D = scene.get_node_or_null("SpatialLabels/CurveTypesLabel") as Label3D
+  assert_object(line_label).is_not_null()
+  assert_object(polyline_label).is_not_null()
+  assert_object(curve_label).is_not_null()
+
+  assert_str(line_label.text).contains("draw_line")
+  assert_str(line_label.text).contains("DEFAULT")
+  assert_str(line_label.text).contains("DASH")
+  assert_str(line_label.text).contains("DOT")
+  assert_str(polyline_label.text).contains("draw_polyline")
+  assert_str(curve_label.text).contains("draw_curve")
+  assert_str(curve_label.text).contains("BEZIER")
+  assert_str(curve_label.text).contains("ROUND_CORNER")
+  assert_str(curve_label.text).contains("CLOSED_ROUND_CORNER")
+  assert_str(curve_label.text).contains("CATMULL_ROM")
+  assert_str(curve_label.text).contains("LINES")
+  assert_str(curve_label.text).contains("HERMITE")
+  assert_str(curve_label.text).contains("draw_line_3d")
+  assert_str(curve_label.text).contains("draw_polyline_3d")
+
+
 func test_ui_info_keeps_camera_state_and_adds_operation_help() -> void:
   var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
   add_child(scene)
