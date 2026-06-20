@@ -13,7 +13,7 @@ var _last_info_text := ""
 
 @onready var _free_camera: FreeCamera = $FreeCamera
 @onready var _info_label: Label = $UI/InfoLabel
-@onready var _debug_draw: DebugDraw3DNode = $DebugDraw3D
+@onready var _debug_draw: DebugDraw3DNode = %DebugDraw3D
 
 
 func _ready() -> void:

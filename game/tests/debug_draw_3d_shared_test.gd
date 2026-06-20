@@ -136,6 +136,91 @@ func test_curve_families_render_all_curve_types() -> void:
   assert_int(debug_draw.get_depth_mesh_instance().mesh.get_surface_count()).is_greater(0)
 
 
+func test_curve_sampling_follows_jwu_immediate_semantics() -> void:
+  var debug_draw: DebugDraw3DNode = auto_free(DebugDraw3DNode.new()) as DebugDraw3DNode
+
+  var bezier_points := PackedVector3Array(
+    [
+      Vector3(0.0, 0.0, 0.0),
+      Vector3(1.0, 0.0, 0.0),
+      Vector3(2.0, 0.0, 0.0),
+      Vector3(3.0, 0.0, 0.0),
+      Vector3(4.0, 0.0, 0.0),
+      Vector3(5.0, 0.0, 0.0),
+      Vector3(6.0, 0.0, 0.0),
+    ],
+  )
+  var bezier: PackedVector3Array = debug_draw.call(
+    "_sample_curve",
+    bezier_points,
+    DebugDraw3DNode.CurveType.BEZIER,
+  ) as PackedVector3Array
+  assert_int(bezier.size()).is_greater(bezier_points.size())
+  assert_float(bezier[bezier.size() - 1].x).is_equal_approx(6.0, 0.001)
+
+  var hermite: PackedVector3Array = debug_draw.call(
+    "_sample_curve",
+    PackedVector3Array(
+      [
+        Vector3(0.0, 0.0, 0.0),
+        Vector3(1.0, 1.0, 0.0),
+        Vector3(2.0, 0.0, 0.0),
+        Vector3(3.0, -1.0, 0.0),
+      ],
+    ),
+    DebugDraw3DNode.CurveType.HERMITE,
+  ) as PackedVector3Array
+  assert_float(hermite[hermite.size() - 1].x).is_equal_approx(2.0, 0.001)
+
+
+func test_dense_cylinder_curves_keep_immediate_vertex_budget() -> void:
+  var debug_draw: DebugDraw3DNode = auto_free(DEBUG_DRAW_3D_SHARED_SCENE.instantiate()) as DebugDraw3DNode
+  add_child(debug_draw)
+  await get_tree().process_frame
+
+  var points := PackedVector3Array(
+    [
+      Vector3(-20.0, 0.0, 6.0),
+      Vector3(-16.0, 4.0, 8.0),
+      Vector3(-12.0, 1.0, 12.0),
+      Vector3(-8.0, 5.0, 10.0),
+    ],
+  )
+  var arrow_points := points.duplicate()
+  arrow_points.append(Vector3(-4.0, 2.0, 12.0))
+  debug_draw.draw_cylinder_curve(
+    points,
+    0.08,
+    Color.ORANGE,
+    DebugDraw3DNode.CurveType.BEZIER,
+    DebugDraw3DNode.MeshType.MIXED,
+  )
+  debug_draw.draw_cylinder_arrow_curve(
+    arrow_points,
+    0.08,
+    Color.GREEN,
+    DebugDraw3DNode.CurveType.CATMULL_ROM,
+  )
+  await get_tree().process_frame
+
+  var vertex_count := _count_mesh_vertices(debug_draw.get_depth_mesh_instance().mesh)
+  assert_int(vertex_count).is_less(80000)
+
+
+func test_mixed_mesh_uses_translucent_solid_color() -> void:
+  var debug_draw: DebugDraw3DNode = auto_free(DEBUG_DRAW_3D_SHARED_SCENE.instantiate()) as DebugDraw3DNode
+  add_child(debug_draw)
+  await get_tree().process_frame
+
+  debug_draw.draw_box(Vector3.ZERO, Vector3.ONE, Color.RED, DebugDraw3DNode.MeshType.MIXED)
+  await get_tree().process_frame
+
+  var depth_mesh: Mesh = debug_draw.get_depth_mesh_instance().mesh
+  var triangle_arrays: Array = depth_mesh.surface_get_arrays(1)
+  var triangle_colors: PackedColorArray = triangle_arrays[Mesh.ARRAY_COLOR]
+  assert_float(triangle_colors[0].a).is_equal_approx(0.2, 0.001)
+
+
 func test_mesh_types_generate_observable_surfaces() -> void:
   var debug_draw: DebugDraw3DNode = auto_free(DEBUG_DRAW_3D_SHARED_SCENE.instantiate()) as DebugDraw3DNode
   add_child(debug_draw)
@@ -149,3 +234,12 @@ func test_mesh_types_generate_observable_surfaces() -> void:
   await get_tree().process_frame
 
   assert_int(debug_draw.get_depth_mesh_instance().mesh.get_surface_count()).is_greater(1)
+
+
+func _count_mesh_vertices(mesh: Mesh) -> int:
+  var vertices := 0
+  for surface_index in mesh.get_surface_count():
+    var arrays := mesh.surface_get_arrays(surface_index)
+    var surface_vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+    vertices += surface_vertices.size()
+  return vertices
