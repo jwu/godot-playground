@@ -130,6 +130,29 @@ func test_shape_labels_describe_api_and_mesh_type_coverage() -> void:
   assert_str(pipe_label.text).contains("MIXED")
 
 
+func test_layer_key_toggle_changes_visible_layers_and_ui() -> void:
+  var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
+  add_child(scene)
+  await get_tree().process_frame
+
+  var debug_draw: DebugDraw3DNode = scene.get_node_or_null("DebugDraw3D") as DebugDraw3DNode
+  var info_label: Label = scene.get_node_or_null("UI/InfoLabel") as Label
+  assert_object(debug_draw).is_not_null()
+  assert_object(info_label).is_not_null()
+  assert_int(debug_draw.visible_layers).is_equal(7)
+  assert_str(info_label.text).contains("Layer: 1=ON 2=ON 3=ON")
+
+  var key_event := InputEventKey.new()
+  key_event.keycode = KEY_2
+  key_event.physical_keycode = KEY_2
+  key_event.pressed = true
+  Input.parse_input_event(key_event)
+  await get_tree().process_frame
+
+  assert_int(debug_draw.visible_layers).is_equal(5)
+  assert_str(info_label.text).contains("Layer: 1=ON 2=OFF 3=ON")
+
+
 func test_ui_info_keeps_camera_state_and_adds_operation_help() -> void:
   var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
   add_child(scene)

@@ -8,6 +8,10 @@ const DebugDraw3DNode := preload("res://shared/debug_draw_3d/debug_draw_3d.gd")
 const DESIGN_WIDTH := 1280
 const DESIGN_HEIGHT := 720
 const GRID_HALF := 30
+const LAYER_LINES := 1
+const LAYER_SHAPES := 2
+const LAYER_BEHAVIOR := 4
+const ALL_DEMO_LAYERS := LAYER_LINES | LAYER_SHAPES | LAYER_BEHAVIOR
 const LABEL_FONT_SIZE := 18
 const LABEL_PIXEL_SIZE := 0.003
 const INFO_PREFIX := "DebugDraw3D API 覆盖样例\n基础操作：中键旋转 / Shift+中键平移 / 滚轮缩放 / 右键 Freelook / Esc 返回\n"
@@ -26,6 +30,7 @@ func _ready() -> void:
   get_window().content_scale_size = Vector2i(DESIGN_WIDTH, DESIGN_HEIGHT)
   get_window().content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
   get_window().content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
+  _debug_draw.visible_layers = ALL_DEMO_LAYERS
   _setup_spatial_labels()
   _update_info_label()
 
@@ -36,6 +41,9 @@ func _process(_delta: float) -> void:
 
 
 func _input(event: InputEvent) -> void:
+  if _handle_layer_input(event):
+    return
+
   if event.is_action_pressed(&"ui_cancel"):
     if _free_camera.is_freelook_active():
       _free_camera.set_freelook_active(false)
@@ -44,7 +52,7 @@ func _input(event: InputEvent) -> void:
 
 
 func _update_info_label() -> void:
-  var text := INFO_PREFIX + _free_camera.get_info_text()
+  var text := INFO_PREFIX + _layer_info_text() + "\n" + _free_camera.get_info_text()
   if text != _last_info_text:
     _info_label.text = text
     _last_info_text = text
@@ -57,20 +65,63 @@ func _draw_demos() -> void:
   _draw_flat_shape_demos()
   _draw_volume_demos()
   _draw_arrow_demos()
+  _draw_behavior_demos()
 
 
 func _draw_axes() -> void:
   var axis_len := float(GRID_HALF) + 2.0
-  _debug_draw.draw_line(Vector3(-axis_len, 0.0, 0.0), Vector3(axis_len, 0.0, 0.0), Color.RED)
-  _debug_draw.draw_line(Vector3(0.0, -axis_len, 0.0), Vector3(0.0, axis_len, 0.0), Color.GREEN)
-  _debug_draw.draw_line(Vector3(0.0, 0.0, -axis_len), Vector3(0.0, 0.0, axis_len), Color.BLUE)
+  _debug_draw.draw_line(
+    Vector3(-axis_len, 0.0, 0.0),
+    Vector3(axis_len, 0.0, 0.0),
+    Color.RED,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_BEHAVIOR,
+  )
+  _debug_draw.draw_line(
+    Vector3(0.0, -axis_len, 0.0),
+    Vector3(0.0, axis_len, 0.0),
+    Color.GREEN,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_BEHAVIOR,
+  )
+  _debug_draw.draw_line(
+    Vector3(0.0, 0.0, -axis_len),
+    Vector3(0.0, 0.0, axis_len),
+    Color.BLUE,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_BEHAVIOR,
+  )
 
 
 func _draw_line_demos() -> void:
   var origin := Vector3(-20.0, 0.0, -20.0)
-  _debug_draw.draw_line(origin, origin + Vector3(8.0, 0.0, 0.0), Color.WHITE)
-  _debug_draw.draw_line(origin, origin + Vector3(0.0, 6.0, 0.0), Color.RED, DebugDraw3DNode.LineStyle.DASH)
-  _debug_draw.draw_line(origin, origin + Vector3(0.0, 0.0, 8.0), Color.GREEN, DebugDraw3DNode.LineStyle.DOT)
+  _debug_draw.draw_line(
+    origin,
+    origin + Vector3(8.0, 0.0, 0.0),
+    Color.WHITE,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_LINES,
+  )
+  _debug_draw.draw_line(
+    origin,
+    origin + Vector3(0.0, 6.0, 0.0),
+    Color.RED,
+    DebugDraw3DNode.LineStyle.DASH,
+    false,
+    LAYER_LINES,
+  )
+  _debug_draw.draw_line(
+    origin,
+    origin + Vector3(0.0, 0.0, 8.0),
+    Color.GREEN,
+    DebugDraw3DNode.LineStyle.DOT,
+    false,
+    LAYER_LINES,
+  )
   _debug_draw.draw_polyline(
     PackedVector3Array(
       [
@@ -81,6 +132,9 @@ func _draw_line_demos() -> void:
       ],
     ),
     Color.DEEP_SKY_BLUE,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_LINES,
   )
   _debug_draw.draw_cylinder_line(
     origin + Vector3(10.0, 0.0, 0.0),
@@ -88,6 +142,9 @@ func _draw_line_demos() -> void:
     0.12,
     Color.ORANGE,
     DebugDraw3DNode.MeshType.MIXED,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_SHAPES,
   )
   _debug_draw.draw_cylinder_polyline(
     PackedVector3Array(
@@ -99,6 +156,10 @@ func _draw_line_demos() -> void:
     ),
     0.1,
     Color.LIGHT_GREEN,
+    DebugDraw3DNode.MeshType.WIREFRAME,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_SHAPES,
   )
 
 
@@ -144,6 +205,9 @@ func _draw_curve_demos() -> void:
       _offset_points(base_points, spec["offset"]),
       spec["color"],
       int(spec["type"]),
+      DebugDraw3DNode.LineStyle.DEFAULT,
+      false,
+      LAYER_LINES,
     )
 
   var arrow_points := _offset_points(base_points, Vector3(0.0, 0.0, 14.0))
@@ -153,6 +217,9 @@ func _draw_curve_demos() -> void:
     Color.YELLOW,
     DebugDraw3DNode.CurveType.CATMULL_ROM,
     DebugDraw3DNode.ArrowPointType.PRISMATIC,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_LINES,
   )
   _debug_draw.draw_cylinder_curve(
     _offset_points(base_points, Vector3(10.0, 0.0, 14.0)),
@@ -160,6 +227,9 @@ func _draw_curve_demos() -> void:
     Color(0.4, 1.0, 0.6, 0.8),
     DebugDraw3DNode.CurveType.BEZIER,
     DebugDraw3DNode.MeshType.MIXED,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_SHAPES,
   )
   _debug_draw.draw_cylinder_arrow_curve(
     arrow_points,
@@ -167,6 +237,10 @@ func _draw_curve_demos() -> void:
     Color(1.0, 0.6, 0.2, 0.85),
     DebugDraw3DNode.CurveType.CATMULL_ROM,
     DebugDraw3DNode.ArrowPointType.PRISMATIC,
+    DebugDraw3DNode.MeshType.SOLID,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_SHAPES,
   )
 
 
@@ -177,6 +251,9 @@ func _draw_flat_shape_demos() -> void:
     Vector3.UP,
     Color(0.2, 0.8, 1.0, 0.35),
     DebugDraw3DNode.MeshType.MIXED,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_SHAPES,
   )
   _debug_draw.draw_flat_rect(
     Vector3(18.0, 2.0, 8.0),
@@ -185,6 +262,9 @@ func _draw_flat_shape_demos() -> void:
     Vector3.UP,
     Color(1.0, 0.5, 0.1, 0.45),
     DebugDraw3DNode.MeshType.MIXED,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_SHAPES,
   )
   _debug_draw.draw_flat_triangle(
     Vector3(11.0, 0.1, 16.0),
@@ -193,6 +273,8 @@ func _draw_flat_shape_demos() -> void:
     Color.MAGENTA,
     DebugDraw3DNode.MeshType.WIREFRAME,
     DebugDraw3DNode.LineStyle.DASH,
+    false,
+    LAYER_SHAPES,
   )
 
 
@@ -202,12 +284,18 @@ func _draw_volume_demos() -> void:
     Vector3(5.0, 5.0, 5.0),
     Color(1.0, 0.9, 0.1, 0.35),
     DebugDraw3DNode.MeshType.SOLID,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_SHAPES,
   )
   _debug_draw.draw_sphere(
     Vector3(0.0, 5.0, -18.0),
     4.0,
     Color.GREEN,
     DebugDraw3DNode.MeshType.WIREFRAME,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_SHAPES,
   )
   _debug_draw.draw_cylinder(
     Vector3(-8.0, 3.0, -18.0),
@@ -215,6 +303,10 @@ func _draw_volume_demos() -> void:
     6.0,
     Color.ORANGE,
     DebugDraw3DNode.MeshType.MIXED,
+    Vector3.UP,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_SHAPES,
   )
   _debug_draw.draw_capsule(
     Vector3(-16.0, 4.0, -18.0),
@@ -222,6 +314,10 @@ func _draw_volume_demos() -> void:
     7.0,
     Color.CORNFLOWER_BLUE,
     DebugDraw3DNode.MeshType.WIREFRAME,
+    Vector3.UP,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_SHAPES,
   )
   _debug_draw.draw_cone(
     Vector3(22.0, 3.0, -18.0),
@@ -229,6 +325,10 @@ func _draw_volume_demos() -> void:
     6.0,
     Color.MAGENTA,
     DebugDraw3DNode.MeshType.WIREFRAME,
+    Vector3.UP,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_SHAPES,
   )
 
 
@@ -239,18 +339,27 @@ func _draw_arrow_demos() -> void:
     origin + Vector3.RIGHT * 6.0,
     Color.WHITE,
     DebugDraw3DNode.ArrowPointType.NONE,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_LINES,
   )
   _debug_draw.draw_arrow(
     origin + Vector3(0.0, 2.0, 0.0),
     origin + Vector3(6.0, 2.0, 0.0),
     Color.RED,
     DebugDraw3DNode.ArrowPointType.TRIANGLE,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_LINES,
   )
   _debug_draw.draw_arrow(
     origin,
     origin + Vector3.UP * 5.0,
     Color.GREEN,
     DebugDraw3DNode.ArrowPointType.PRISMATIC,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_LINES,
   )
   _debug_draw.draw_arrow(
     origin,
@@ -258,6 +367,8 @@ func _draw_arrow_demos() -> void:
     Color.BLUE,
     DebugDraw3DNode.ArrowPointType.CIRCLE,
     DebugDraw3DNode.LineStyle.DASH,
+    false,
+    LAYER_LINES,
   )
 
   var arrow_curve_points := PackedVector3Array(
@@ -273,6 +384,9 @@ func _draw_arrow_demos() -> void:
     Color.YELLOW,
     DebugDraw3DNode.CurveType.CATMULL_ROM,
     DebugDraw3DNode.ArrowPointType.CIRCLE,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_LINES,
   )
   _debug_draw.draw_3d_arrow(
     Vector3(3.0, 0.5, 12.0),
@@ -281,6 +395,7 @@ func _draw_arrow_demos() -> void:
     Color(1.0, 0.9, 0.2, 0.75),
     DebugDraw3DNode.ArrowPointType.PRISMATIC,
     true,
+    LAYER_LINES,
   )
   _debug_draw.draw_cylinder_arrow_curve(
     _offset_points(arrow_curve_points, Vector3(24.0, 0.0, 0.0)),
@@ -289,6 +404,9 @@ func _draw_arrow_demos() -> void:
     DebugDraw3DNode.CurveType.BEZIER,
     DebugDraw3DNode.ArrowPointType.TRIANGLE,
     DebugDraw3DNode.MeshType.MIXED,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_SHAPES,
   )
 
 
@@ -340,6 +458,80 @@ func _setup_spatial_labels() -> void:
     "draw_cylinder_line / draw_cylinder_polyline / draw_cylinder_curve\n粗线、粗折线、粗曲线\nMeshType: SOLID / WIREFRAME / MIXED",
     Vector3(4.0, 7.0, 0.0),
   )
+  _add_spatial_label("BehaviorTitle", "渲染行为 / Layer", Vector3(20.0, 8.0, 0.0))
+  _add_spatial_label(
+    "OverheadLayerLabel",
+    "depth-tested vs overhead\n数字键 1/2/3 切换 layer\nLayer 1: 线段曲线  2: 形状管线  3: 坐标轴与行为",
+    Vector3(22.0, 6.0, 6.0),
+  )
+
+
+func _draw_behavior_demos() -> void:
+  var occluder_center := Vector3(20.0, 2.0, 0.0)
+  _debug_draw.draw_box(
+    occluder_center,
+    Vector3(3.0, 4.0, 3.0),
+    Color(0.25, 0.25, 0.28, 0.65),
+    DebugDraw3DNode.MeshType.SOLID,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_BEHAVIOR,
+  )
+  _debug_draw.draw_line(
+    occluder_center + Vector3(-4.0, 0.0, 0.0),
+    occluder_center + Vector3(4.0, 0.0, 0.0),
+    Color.RED,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    false,
+    LAYER_BEHAVIOR,
+  )
+  _debug_draw.draw_line(
+    occluder_center + Vector3(-4.0, 1.0, 1.0),
+    occluder_center + Vector3(4.0, 1.0, 1.0),
+    Color.LIME_GREEN,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    true,
+    LAYER_BEHAVIOR,
+  )
+
+
+func _handle_layer_input(event: InputEvent) -> bool:
+  if not event is InputEventKey:
+    return false
+
+  var key_event := event as InputEventKey
+  if not key_event.pressed or key_event.echo:
+    return false
+
+  match key_event.keycode:
+    KEY_1:
+      _toggle_layer(LAYER_LINES)
+      return true
+    KEY_2:
+      _toggle_layer(LAYER_SHAPES)
+      return true
+    KEY_3:
+      _toggle_layer(LAYER_BEHAVIOR)
+      return true
+  return false
+
+
+func _toggle_layer(layer: int) -> void:
+  _debug_draw.set_layer_enabled(layer, (_debug_draw.visible_layers & layer) == 0)
+  _last_info_text = ""
+  _update_info_label()
+
+
+func _layer_info_text() -> String:
+  return "Layer: 1=%s 2=%s 3=%s" % [
+    _layer_state_text(LAYER_LINES),
+    _layer_state_text(LAYER_SHAPES),
+    _layer_state_text(LAYER_BEHAVIOR),
+  ]
+
+
+func _layer_state_text(layer: int) -> String:
+  return "ON" if (_debug_draw.visible_layers & layer) != 0 else "OFF"
 
 
 func _offset_points(points: PackedVector3Array, offset: Vector3) -> PackedVector3Array:
