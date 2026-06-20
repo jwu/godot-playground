@@ -37,6 +37,38 @@ func test_ready_uses_shared_debug_draw_node_and_redraws_surfaces() -> void:
   assert_int(debug_draw.get_depth_mesh_instance().mesh.get_surface_count()).is_greater(0)
 
 
+func test_ready_creates_reusable_spatial_labels() -> void:
+  var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
+  add_child(scene)
+  await get_tree().process_frame
+
+  var title_label: Label3D = scene.get_node_or_null("SpatialLabels/ApiCoverageTitle") as Label3D
+  assert_object(title_label).is_not_null()
+  assert_str(title_label.text).contains("API 覆盖样例")
+  assert_int(title_label.billboard).is_equal(BaseMaterial3D.BILLBOARD_ENABLED)
+  assert_bool(title_label.fixed_size).is_true()
+  assert_bool(title_label.no_depth_test).is_true()
+  assert_bool(title_label.shaded).is_false()
+
+  var title_instance_id := title_label.get_instance_id()
+  await get_tree().process_frame
+  var same_title_label: Label3D = scene.get_node_or_null("SpatialLabels/ApiCoverageTitle") as Label3D
+  assert_object(same_title_label).is_not_null()
+  assert_int(same_title_label.get_instance_id()).is_equal(title_instance_id)
+
+
+func test_ui_info_keeps_camera_state_and_adds_operation_help() -> void:
+  var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
+  add_child(scene)
+  await get_tree().process_frame
+
+  var info_label: Label = scene.get_node_or_null("UI/InfoLabel") as Label
+  assert_object(info_label).is_not_null()
+  assert_str(info_label.text).contains("DebugDraw3D API 覆盖样例")
+  assert_str(info_label.text).contains("基础操作")
+  assert_str(info_label.text).contains("Dist:")
+
+
 func test_shared_debug_draw_uses_vertex_color_unshaded_materials() -> void:
   var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
   add_child(scene)

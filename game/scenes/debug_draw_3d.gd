@@ -8,8 +8,12 @@ const DebugDraw3DNode := preload("res://shared/debug_draw_3d/debug_draw_3d.gd")
 const DESIGN_WIDTH := 1280
 const DESIGN_HEIGHT := 720
 const GRID_HALF := 30
+const LABEL_FONT_SIZE := 18
+const LABEL_PIXEL_SIZE := 0.003
+const INFO_PREFIX := "DebugDraw3D API 覆盖样例\n基础操作：中键旋转 / Shift+中键平移 / 滚轮缩放 / 右键 Freelook / Esc 返回\n"
 
 var _last_info_text := ""
+var _spatial_labels: Node3D
 
 @onready var _free_camera: FreeCamera = $FreeCamera
 @onready var _info_label: Label = $UI/InfoLabel
@@ -22,6 +26,8 @@ func _ready() -> void:
   get_window().content_scale_size = Vector2i(DESIGN_WIDTH, DESIGN_HEIGHT)
   get_window().content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
   get_window().content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
+  _setup_spatial_labels()
+  _update_info_label()
 
 
 func _process(_delta: float) -> void:
@@ -38,7 +44,7 @@ func _input(event: InputEvent) -> void:
 
 
 func _update_info_label() -> void:
-  var text := _free_camera.get_info_text()
+  var text := INFO_PREFIX + _free_camera.get_info_text()
   if text != _last_info_text:
     _info_label.text = text
     _last_info_text = text
@@ -221,3 +227,37 @@ func _draw_arrow_demos() -> void:
     DebugDraw3DNode.ArrowPointType.PRISMATIC,
     true,
   )
+
+
+func _setup_spatial_labels() -> void:
+  _spatial_labels = Node3D.new()
+  _spatial_labels.name = "SpatialLabels"
+  add_child(_spatial_labels)
+  _add_spatial_label(
+    "ApiCoverageTitle",
+    "API 覆盖样例\nDebugDraw3D 绘制能力总览",
+    Vector3(0.0, 8.0, 0.0),
+  )
+  _add_spatial_label("LinesTitle", "线段 / 折线", Vector3(-16.0, 5.0, -20.0))
+  _add_spatial_label("CurvesTitle", "曲线 / 箭头曲线", Vector3(-13.0, 7.0, 10.0))
+  _add_spatial_label("ShapesTitle", "平面与体积形状", Vector3(12.0, 7.0, -10.0))
+
+
+func _add_spatial_label(label_name: String, text: String, label_position: Vector3) -> Label3D:
+  var label := Label3D.new()
+  label.name = label_name
+  label.text = text
+  label.position = label_position
+  label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+  label.fixed_size = true
+  label.no_depth_test = true
+  label.shaded = false
+  label.double_sided = true
+  label.font_size = LABEL_FONT_SIZE
+  label.pixel_size = LABEL_PIXEL_SIZE
+  label.modulate = Color(0.86, 0.94, 1.0, 1.0)
+  label.outline_modulate = Color(0.02, 0.04, 0.06, 1.0)
+  label.outline_size = 8
+  label.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+  _spatial_labels.add_child(label)
+  return label
