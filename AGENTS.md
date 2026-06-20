@@ -81,6 +81,8 @@ project/
 
 Issue 在 GitHub Issues 中跟踪；外部 PR 不作为 triage 请求入口。详见 `docs/agents/issue-tracker.md`。
 
+- Issue 标题与正文默认使用中文，包括 `/to-prd` 生成的 PRD 和 `/to-issues` 拆分出的子 issue。
+
 ### 标签分类 Triage labels
 
 Triage 标签使用默认的五类规范词汇。详见 `docs/agents/triage-labels.md`。
