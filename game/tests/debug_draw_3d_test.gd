@@ -1,5 +1,5 @@
 extends GdUnitTestSuite
-## DebugDraw3D 场景的单元测试
+## DebugDraw3D 场景的基础设施测试
 
 const DebugDraw3DNode := preload("res://shared/debug_draw_3d/debug_draw_3d.gd")
 const DEBUG_DRAW_3D_SCENE := preload("res://scenes/debug_draw_3d.tscn")
@@ -12,19 +12,20 @@ func test_scene_loads() -> void:
   assert_str(scene.name).is_equal("DebugDraw3D")
 
 
-func test_scene_has_required_nodes() -> void:
+func test_scene_has_required_infrastructure_nodes() -> void:
   var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
 
   assert_object(scene).is_not_null()
   assert_object(scene.get_node_or_null("FreeCamera")).is_not_null()
   assert_bool(scene.get_node("FreeCamera") is Camera3D).is_true()
+  assert_object(scene.get_node_or_null("EndlessGrid3D")).is_not_null()
   assert_object(scene.get_node_or_null("DebugDraw3D")).is_not_null()
   assert_bool(scene.get_node("DebugDraw3D") is DebugDraw3DNode).is_true()
   assert_object(scene.get_node_or_null("UI")).is_not_null()
   assert_object(scene.get_node_or_null("UI/InfoLabel")).is_not_null()
 
 
-func test_ready_uses_shared_debug_draw_node_and_redraws_surfaces() -> void:
+func test_ready_draws_draw_line_demo_surfaces() -> void:
   var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
   add_child(scene)
   await get_tree().process_frame
@@ -35,88 +36,69 @@ func test_ready_uses_shared_debug_draw_node_and_redraws_surfaces() -> void:
   assert_object(debug_draw.get_depth_mesh_instance().mesh).is_not_null()
   assert_bool(debug_draw.get_depth_mesh_instance().mesh is ImmediateMesh).is_true()
   assert_int(debug_draw.get_depth_mesh_instance().mesh.get_surface_count()).is_greater(0)
+  assert_int(debug_draw.get_overhead_mesh_instance().mesh.get_surface_count()).is_greater(0)
 
 
-func test_ready_creates_reusable_section_labels_as_depth_tested_3d_signs() -> void:
+func test_ready_creates_origin_axes_labels() -> void:
   var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
   add_child(scene)
   await get_tree().process_frame
 
-  var labels_root: Node = scene.get_node_or_null("SpatialLabels")
-  assert_object(labels_root).is_not_null()
-  assert_int(labels_root.get_child_count()).is_equal(6)
+  var x_label: Label3D = scene.get_node_or_null("OriginAxesLabels/XAxisLabel") as Label3D
+  var y_label: Label3D = scene.get_node_or_null("OriginAxesLabels/YAxisLabel") as Label3D
+  var z_label: Label3D = scene.get_node_or_null("OriginAxesLabels/ZAxisLabel") as Label3D
+  assert_object(x_label).is_not_null()
+  assert_object(y_label).is_not_null()
+  assert_object(z_label).is_not_null()
+  assert_str(x_label.text).is_equal("X")
+  assert_str(y_label.text).is_equal("Y")
+  assert_str(z_label.text).is_equal("Z")
+  assert_bool(x_label.no_depth_test).is_false()
 
-  var title_label: Label3D = scene.get_node_or_null("SpatialLabels/ApiCoverageTitle") as Label3D
+
+func test_ready_creates_reusable_draw_line_labels() -> void:
+  var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
+  add_child(scene)
+  await get_tree().process_frame
+
+  var title_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawLineTitle") as Label3D
+  var dash_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawLineDashLabel") as Label3D
+  var dot_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawLineDotLabel") as Label3D
+  var overhead_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawLineOverheadLabel") as Label3D
   assert_object(title_label).is_not_null()
-  assert_str(title_label.text).contains("API 覆盖样例")
-  assert_int(title_label.billboard).is_equal(BaseMaterial3D.BILLBOARD_DISABLED)
+  assert_object(dash_label).is_not_null()
+  assert_object(dot_label).is_not_null()
+  assert_object(overhead_label).is_not_null()
+  assert_str(title_label.text).contains("draw_line")
+  assert_str(dash_label.text).contains("DASH")
+  assert_str(dot_label.text).contains("DOT")
+  assert_str(overhead_label.text).contains("overhead=true")
   assert_bool(title_label.fixed_size).is_false()
   assert_bool(title_label.no_depth_test).is_false()
-  assert_bool(is_equal_approx(absf(title_label.global_basis.z.y), 0.0)).is_true()
+  assert_int(title_label.font_size).is_equal(18)
+  assert_float(title_label.pixel_size).is_equal_approx(0.008, 0.0001)
+  assert_int(dash_label.horizontal_alignment).is_equal(HORIZONTAL_ALIGNMENT_RIGHT)
+  assert_vector(title_label.position).is_equal(Vector3(0.9, 0.1, -0.5))
+  assert_vector(dash_label.position).is_equal(Vector3(0.9, 0.1, -2.0))
 
   var title_instance_id := title_label.get_instance_id()
   await get_tree().process_frame
-  var same_title_label: Label3D = scene.get_node_or_null("SpatialLabels/ApiCoverageTitle") as Label3D
-  assert_object(same_title_label).is_not_null()
+  var same_title_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawLineTitle") as Label3D
   assert_int(same_title_label.get_instance_id()).is_equal(title_instance_id)
 
 
-func test_section_labels_cover_major_demo_areas() -> void:
-  var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
-  add_child(scene)
-  await get_tree().process_frame
-
-  var line_label: Label3D = scene.get_node_or_null("SpatialLabels/LinesTitle") as Label3D
-  var curve_label: Label3D = scene.get_node_or_null("SpatialLabels/CurvesTitle") as Label3D
-  var arrow_label: Label3D = scene.get_node_or_null("SpatialLabels/ArrowsTitle") as Label3D
-  var shape_label: Label3D = scene.get_node_or_null("SpatialLabels/ShapesTitle") as Label3D
-  var behavior_label: Label3D = scene.get_node_or_null("SpatialLabels/BehaviorTitle") as Label3D
-  assert_object(line_label).is_not_null()
-  assert_object(curve_label).is_not_null()
-  assert_object(arrow_label).is_not_null()
-  assert_object(shape_label).is_not_null()
-  assert_object(behavior_label).is_not_null()
-
-  assert_str(line_label.text).contains("线段")
-  assert_str(curve_label.text).contains("曲线")
-  assert_str(arrow_label.text).contains("箭头")
-  assert_str(shape_label.text).contains("形状")
-  assert_str(behavior_label.text).contains("Layer")
-
-
-func test_layer_key_toggle_changes_visible_layers_and_ui() -> void:
-  var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
-  add_child(scene)
-  await get_tree().process_frame
-
-  var debug_draw: DebugDraw3DNode = scene.get_node_or_null("DebugDraw3D") as DebugDraw3DNode
-  var info_label: Label = scene.get_node_or_null("UI/InfoLabel") as Label
-  assert_object(debug_draw).is_not_null()
-  assert_object(info_label).is_not_null()
-  assert_int(debug_draw.visible_layers).is_equal(7)
-  assert_str(info_label.text).contains("Layer: 1=ON 2=ON 3=ON")
-
-  var key_event := InputEventKey.new()
-  key_event.keycode = KEY_2
-  key_event.physical_keycode = KEY_2
-  key_event.pressed = true
-  Input.parse_input_event(key_event)
-  await get_tree().process_frame
-
-  assert_int(debug_draw.visible_layers).is_equal(5)
-  assert_str(info_label.text).contains("Layer: 1=ON 2=OFF 3=ON")
-
-
-func test_ui_info_keeps_camera_state_and_adds_operation_help() -> void:
+func test_ui_info_keeps_camera_state_without_operation_help() -> void:
   var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
   add_child(scene)
   await get_tree().process_frame
 
   var info_label: Label = scene.get_node_or_null("UI/InfoLabel") as Label
   assert_object(info_label).is_not_null()
-  assert_str(info_label.text).contains("DebugDraw3D API 覆盖样例")
-  assert_str(info_label.text).contains("基础操作")
   assert_str(info_label.text).contains("Dist:")
+  assert_str(info_label.text).contains("Speed:")
+  assert_str(info_label.text).not_contains("基础操作")
+  assert_str(info_label.text).not_contains("中键")
+  assert_str(info_label.text).not_contains("Esc")
 
 
 func test_shared_debug_draw_uses_vertex_color_unshaded_materials() -> void:

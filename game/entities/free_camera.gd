@@ -13,11 +13,11 @@ const ZOOM_FREELOOK_MIN := 0.01
 const ZOOM_FREELOOK_MAX := 10000.0
 const ZOOM_FACTOR := 1.08
 const ZOOM_DRAG_SPEED := 1.0 / 80.0
-const DEFAULT_DISTANCE := 16.0
+const DEFAULT_DISTANCE := 4.0
 const FREELOOK_BASE_SPEED := 5.0
 
-@export var initial_yaw := -PI * 0.25
-@export var initial_pitch := PI * 0.28
+@export var initial_yaw := PI * 0.4
+@export var initial_pitch := PI * 0.2
 @export var initial_distance := DEFAULT_DISTANCE
 @export var initial_target := Vector3.ZERO
 
