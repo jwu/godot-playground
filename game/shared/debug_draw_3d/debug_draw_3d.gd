@@ -137,17 +137,6 @@ func draw_line(
   )
 
 
-func draw_line_3d(
-    from: Vector3,
-    to: Vector3,
-    color: Color = Color.WHITE,
-    style: LineStyle = LineStyle.DEFAULT,
-    overhead: bool = false,
-    layer: int = DEFAULT_LAYER,
-) -> void:
-  draw_line(from, to, color, style, overhead, layer)
-
-
 func draw_polyline(
     points: PackedVector3Array,
     color: Color = Color.WHITE,
@@ -165,16 +154,6 @@ func draw_polyline(
       "layer": layer,
     },
   )
-
-
-func draw_polyline_3d(
-    points: PackedVector3Array,
-    color: Color = Color.WHITE,
-    style: LineStyle = LineStyle.DEFAULT,
-    overhead: bool = false,
-    layer: int = DEFAULT_LAYER,
-) -> void:
-  draw_polyline(points, color, style, overhead, layer)
 
 
 func draw_curve(
@@ -421,7 +400,7 @@ func draw_cylinder_arrow_curve(
   )
 
 
-func draw_3d_arrow(
+func draw_arrow_3d(
     from: Vector3,
     to: Vector3,
     radius: float,
@@ -442,18 +421,6 @@ func draw_3d_arrow(
       "layer": layer,
     },
   )
-
-
-func draw_arrow_3d(
-    from: Vector3,
-    to: Vector3,
-    radius: float,
-    color: Color = Color.WHITE,
-    point_type: ArrowPointType = ArrowPointType.PRISMATIC,
-    overhead: bool = false,
-    layer: int = DEFAULT_LAYER,
-) -> void:
-  draw_3d_arrow(from, to, radius, color, point_type, overhead, layer)
 
 
 func draw_box(

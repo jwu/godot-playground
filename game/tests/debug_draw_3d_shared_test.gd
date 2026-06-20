@@ -65,13 +65,13 @@ func test_line_and_polyline_families_render() -> void:
   add_child(debug_draw)
   await get_tree().process_frame
 
-  debug_draw.draw_line_3d(Vector3.ZERO, Vector3.RIGHT, Color.RED)
+  debug_draw.draw_line(Vector3.ZERO, Vector3.RIGHT, Color.RED)
   debug_draw.draw_polyline(
     PackedVector3Array([Vector3.ZERO, Vector3.UP, Vector3(1.0, 1.0, 0.0)]),
     Color.GREEN,
     DebugDraw3DNode.LineStyle.DASH,
   )
-  debug_draw.draw_polyline_3d(
+  debug_draw.draw_polyline(
     PackedVector3Array([Vector3(1.0, 0.0, 0.0), Vector3(1.0, 1.0, 0.0)]),
     Color.ORANGE,
   )
@@ -92,8 +92,7 @@ func test_flat_shapes_and_arrow_families_render() -> void:
   await get_tree().process_frame
 
   debug_draw.draw_arrow(Vector3.ZERO, Vector3.RIGHT, Color.RED, DebugDraw3DNode.ArrowPointType.CIRCLE)
-  debug_draw.draw_3d_arrow(Vector3(0.0, 1.0, 0.0), Vector3(1.0, 1.0, 0.0), 0.08, Color.GREEN)
-  debug_draw.draw_arrow_3d(Vector3(0.0, 2.0, 0.0), Vector3(1.0, 2.0, 0.0), 0.08, Color.CYAN)
+  debug_draw.draw_arrow_3d(Vector3(0.0, 1.0, 0.0), Vector3(1.0, 1.0, 0.0), 0.08, Color.GREEN)
   debug_draw.draw_flat_circle(Vector3(0.0, 0.0, 1.0), 0.5, Vector3.UP, Color.BLUE)
   debug_draw.draw_flat_rect(Vector3(1.5, 0.0, 1.0), Vector2.ONE, Vector3.RIGHT, Vector3.FORWARD, Color.YELLOW)
   debug_draw.draw_flat_triangle(Vector3(3.0, 0.0, 1.0), Vector3(4.0, 0.0, 1.0), Vector3(3.5, 0.0, 2.0), Color.MAGENTA)

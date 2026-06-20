@@ -13,7 +13,7 @@
 ## 非目标
 
 - 不做所有 API × 所有枚举值的完整笛卡尔积。
-- 不把 `draw_line_3d`、`draw_polyline_3d`、`draw_arrow_3d` 这类别名方法做重复展品。
+- 不做已经移除的旧别名 API 展品。
 - 不把空间标签当成 DebugDraw3D 自身的绘制能力。
 - 不新增截图基准或像素级断言。
 
@@ -35,18 +35,18 @@
 - `draw_cylinder_polyline`
 - `draw_cylinder_curve`
 - `draw_cylinder_arrow_curve`
-- `draw_3d_arrow`
+- `draw_arrow_3d`
 - `draw_box`
 - `draw_sphere`
 - `draw_cylinder`
 - `draw_capsule`
 - `draw_cone`
 
-别名 API 只在标签或文档中注明，不单独摆放：
+旧别名 API 不再保留：
 
-- `draw_line_3d` → `draw_line`
-- `draw_polyline_3d` → `draw_polyline`
-- `draw_arrow_3d` → `draw_3d_arrow`
+`draw_line_3d` 已移除：细线使用 `draw_line`，有厚度的 3D 线使用 `draw_cylinder_line`。
+`draw_polyline_3d` 已移除：细折线使用 `draw_polyline`，有厚度的 3D 折线使用 `draw_cylinder_polyline`。
+`draw_3d_arrow` 已移除：体积箭头使用 `draw_arrow_3d`。
 
 ### 枚举覆盖
 
@@ -77,7 +77,7 @@
 | --- | --- | --- |
 | 线段与样式 | 左前 | `draw_line`、`draw_polyline`，展示默认、虚线、点线 |
 | 曲线 | 中前 | `draw_curve` 全部 `CurveType` 代表样例 |
-| 箭头 | 右前 | `draw_arrow`、`draw_arrow_curve`、`draw_3d_arrow`，覆盖箭头头型 |
+| 箭头 | 右前 | `draw_arrow`、`draw_arrow_curve`、`draw_arrow_3d`，覆盖箭头头型 |
 | 平面形状 | 左后 | `draw_flat_circle`、`draw_flat_rect`、`draw_flat_triangle`，覆盖 `MeshType` |
 | 体积形状 | 中后 | `draw_box`、`draw_sphere`、`draw_cylinder`、`draw_capsule`、`draw_cone` |
 | 管线/粗线 | 右后 | `draw_cylinder_line`、`draw_cylinder_polyline`、`draw_cylinder_curve`、`draw_cylinder_arrow_curve` |
@@ -100,7 +100,7 @@
 
 - 每个分区一个标题标签。
 - 每个展品一个短标签，写 API 名和关键参数，例如 `draw_curve: HERMITE`。
-- 别名 API 在相关标签中用括号说明，例如 `draw_line (alias: draw_line_3d)`。
+- 已移除的旧别名不再写入展品标签。
 
 ## 交互
 

@@ -226,11 +226,13 @@ colors.append(color)
 - 不生成圆柱。
 - 不做屏幕空间定宽展开。
 
-如果需要粗线，本项目目前使用独立 API：
+如果需要粗线，本项目使用独立 API：
 
 ```gdscript
 draw_cylinder_line(from, to, radius, ...)
 ```
+
+`draw_line_3d` 已移除，避免与 `draw_cylinder_line` 形成重复概念。jwu `DrawLine3D(width <= 0)` 对应本项目 `draw_line`；jwu `DrawLine3D(width > 0)` 对应本项目 `draw_cylinder_line`。
 
 ### 线型
 
@@ -292,4 +294,4 @@ const DOT_GAP := 0.22
 - `color`
 - `overhead`
 
-如果目标只是调试用细线，当前 `DebugDraw3D.draw_line` 足够简单，并且已经支持 `DASH/DOT` 与 layer。
+如果目标只是调试用细线，当前 `DebugDraw3D.draw_line` 足够简单，并且已经支持 `DASH/DOT` 与 layer。若目标是 jwu `DrawLine3D` 的有厚度线语义，直接使用 `draw_cylinder_line`，不要再新增 `draw_line_3d` 包装。
