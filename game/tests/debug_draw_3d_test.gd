@@ -85,6 +85,23 @@ func test_line_and_curve_labels_describe_api_coverage() -> void:
   assert_str(curve_label.text).contains("draw_polyline_3d")
 
 
+func test_arrow_labels_describe_api_and_point_type_coverage() -> void:
+  var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
+  add_child(scene)
+  await get_tree().process_frame
+
+  var arrow_label: Label3D = scene.get_node_or_null("SpatialLabels/ArrowTypesLabel") as Label3D
+  assert_object(arrow_label).is_not_null()
+  assert_str(arrow_label.text).contains("draw_arrow")
+  assert_str(arrow_label.text).contains("draw_arrow_curve")
+  assert_str(arrow_label.text).contains("draw_3d_arrow")
+  assert_str(arrow_label.text).contains("draw_cylinder_arrow_curve")
+  assert_str(arrow_label.text).contains("NONE")
+  assert_str(arrow_label.text).contains("TRIANGLE")
+  assert_str(arrow_label.text).contains("PRISMATIC")
+  assert_str(arrow_label.text).contains("CIRCLE")
+
+
 func test_ui_info_keeps_camera_state_and_adds_operation_help() -> void:
   var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
   add_child(scene)

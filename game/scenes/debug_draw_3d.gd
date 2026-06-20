@@ -237,6 +237,12 @@ func _draw_arrow_demos() -> void:
   _debug_draw.draw_arrow(
     origin,
     origin + Vector3.RIGHT * 6.0,
+    Color.WHITE,
+    DebugDraw3DNode.ArrowPointType.NONE,
+  )
+  _debug_draw.draw_arrow(
+    origin + Vector3(0.0, 2.0, 0.0),
+    origin + Vector3(6.0, 2.0, 0.0),
     Color.RED,
     DebugDraw3DNode.ArrowPointType.TRIANGLE,
   )
@@ -253,6 +259,21 @@ func _draw_arrow_demos() -> void:
     DebugDraw3DNode.ArrowPointType.CIRCLE,
     DebugDraw3DNode.LineStyle.DASH,
   )
+
+  var arrow_curve_points := PackedVector3Array(
+    [
+      Vector3(-18.0, 0.5, -2.0),
+      Vector3(-14.0, 4.0, 0.0),
+      Vector3(-10.0, 1.0, 3.0),
+      Vector3(-6.0, 4.0, 5.0),
+    ],
+  )
+  _debug_draw.draw_arrow_curve(
+    arrow_curve_points,
+    Color.YELLOW,
+    DebugDraw3DNode.CurveType.CATMULL_ROM,
+    DebugDraw3DNode.ArrowPointType.CIRCLE,
+  )
   _debug_draw.draw_3d_arrow(
     Vector3(3.0, 0.5, 12.0),
     Vector3(8.0, 4.0, 14.0),
@@ -260,6 +281,14 @@ func _draw_arrow_demos() -> void:
     Color(1.0, 0.9, 0.2, 0.75),
     DebugDraw3DNode.ArrowPointType.PRISMATIC,
     true,
+  )
+  _debug_draw.draw_cylinder_arrow_curve(
+    _offset_points(arrow_curve_points, Vector3(24.0, 0.0, 0.0)),
+    0.1,
+    Color(1.0, 0.45, 0.2, 0.85),
+    DebugDraw3DNode.CurveType.BEZIER,
+    DebugDraw3DNode.ArrowPointType.TRIANGLE,
+    DebugDraw3DNode.MeshType.MIXED,
   )
 
 
@@ -288,6 +317,12 @@ func _setup_spatial_labels() -> void:
     "CurveTypesLabel",
     "draw_curve\nCurveType: BEZIER / ROUND_CORNER / CLOSED_ROUND_CORNER / CATMULL_ROM / LINES / HERMITE\n别名说明: draw_line_3d / draw_polyline_3d 仅说明不重复摆放",
     Vector3(-10.0, 8.0, 16.0),
+  )
+  _add_spatial_label("ArrowsTitle", "箭头 / 体积箭头", Vector3(-10.0, 7.0, -2.0))
+  _add_spatial_label(
+    "ArrowTypesLabel",
+    "draw_arrow / draw_arrow_curve / draw_3d_arrow / draw_cylinder_arrow_curve\nArrowPointType: NONE / TRIANGLE / PRISMATIC / CIRCLE\n线框箭头与体积箭头对比",
+    Vector3(-8.0, 7.0, 4.0),
   )
   _add_spatial_label("ShapesTitle", "平面与体积形状", Vector3(12.0, 7.0, -10.0))
 
