@@ -200,8 +200,8 @@ func _draw_volume_demos() -> void:
   _debug_draw.draw_box(
     Vector3(13.0, 3.0, -18.0),
     Vector3(5.0, 5.0, 5.0),
-    Color.YELLOW,
-    DebugDraw3DNode.MeshType.WIREFRAME,
+    Color(1.0, 0.9, 0.1, 0.35),
+    DebugDraw3DNode.MeshType.SOLID,
   )
   _debug_draw.draw_sphere(
     Vector3(0.0, 5.0, -18.0),
@@ -325,6 +325,21 @@ func _setup_spatial_labels() -> void:
     Vector3(-8.0, 7.0, 4.0),
   )
   _add_spatial_label("ShapesTitle", "平面与体积形状", Vector3(12.0, 7.0, -10.0))
+  _add_spatial_label(
+    "FlatShapesLabel",
+    "draw_flat_circle / draw_flat_rect / draw_flat_triangle\n平面 normal / axis 参数控制朝向\nMeshType: MIXED / WIREFRAME",
+    Vector3(16.0, 6.5, 14.0),
+  )
+  _add_spatial_label(
+    "VolumeShapesLabel",
+    "draw_box / draw_sphere / draw_cylinder / draw_capsule / draw_cone\n常用碰撞体调试体积\nMeshType: SOLID / WIREFRAME / MIXED",
+    Vector3(2.0, 9.0, -18.0),
+  )
+  _add_spatial_label(
+    "PipeShapesLabel",
+    "draw_cylinder_line / draw_cylinder_polyline / draw_cylinder_curve\n粗线、粗折线、粗曲线\nMeshType: SOLID / WIREFRAME / MIXED",
+    Vector3(4.0, 7.0, 0.0),
+  )
 
 
 func _offset_points(points: PackedVector3Array, offset: Vector3) -> PackedVector3Array:

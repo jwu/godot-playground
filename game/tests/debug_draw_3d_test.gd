@@ -102,6 +102,34 @@ func test_arrow_labels_describe_api_and_point_type_coverage() -> void:
   assert_str(arrow_label.text).contains("CIRCLE")
 
 
+func test_shape_labels_describe_api_and_mesh_type_coverage() -> void:
+  var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
+  add_child(scene)
+  await get_tree().process_frame
+
+  var flat_label: Label3D = scene.get_node_or_null("SpatialLabels/FlatShapesLabel") as Label3D
+  var volume_label: Label3D = scene.get_node_or_null("SpatialLabels/VolumeShapesLabel") as Label3D
+  var pipe_label: Label3D = scene.get_node_or_null("SpatialLabels/PipeShapesLabel") as Label3D
+  assert_object(flat_label).is_not_null()
+  assert_object(volume_label).is_not_null()
+  assert_object(pipe_label).is_not_null()
+
+  assert_str(flat_label.text).contains("draw_flat_circle")
+  assert_str(flat_label.text).contains("draw_flat_rect")
+  assert_str(flat_label.text).contains("draw_flat_triangle")
+  assert_str(volume_label.text).contains("draw_box")
+  assert_str(volume_label.text).contains("draw_sphere")
+  assert_str(volume_label.text).contains("draw_cylinder")
+  assert_str(volume_label.text).contains("draw_capsule")
+  assert_str(volume_label.text).contains("draw_cone")
+  assert_str(pipe_label.text).contains("draw_cylinder_line")
+  assert_str(pipe_label.text).contains("draw_cylinder_polyline")
+  assert_str(pipe_label.text).contains("draw_cylinder_curve")
+  assert_str(pipe_label.text).contains("SOLID")
+  assert_str(pipe_label.text).contains("WIREFRAME")
+  assert_str(pipe_label.text).contains("MIXED")
+
+
 func test_ui_info_keeps_camera_state_and_adds_operation_help() -> void:
   var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
   add_child(scene)
