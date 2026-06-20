@@ -1,13 +1,9 @@
-[gd_scene format=3 uid="uid://6c1urc5xjtvu"]
+[gd_scene load_steps=5 format=3 uid="uid://6c1urc5xjtvu"]
 
 [ext_resource type="Script" uid="uid://2kveu8hwchum" path="res://scenes/debug_draw_3d.gd" id="1"]
 [ext_resource type="PackedScene" path="res://entities/endless_grid_3d.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://entities/free_camera.tscn" id="3"]
-
-[sub_resource type="StandardMaterial3D" id="2"]
-transparency = 1
-shading_mode = 0
-vertex_color_use_as_albedo = true
+[ext_resource type="PackedScene" path="res://shared/debug_draw_3d/debug_draw_3d.tscn" id="4"]
 
 [node name="DebugDraw3D" type="Node3D" unique_id=114503921]
 script = ExtResource("1")
@@ -18,8 +14,8 @@ script = ExtResource("1")
 thin_line_color = Color(0.33847278, 0.33847293, 0.33847287, 0.5019608)
 thick_line_color = Color(0.46034712, 0.46034718, 0.460347, 0.7019608)
 
-[node name="DrawMesh" type="MeshInstance3D" parent="." unique_id=503818400]
-material_override = SubResource("2")
+[node name="DebugDraw3D" parent="." unique_id=503818400 instance=ExtResource("4")]
+unique_name_in_owner = true
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1498506438]
 

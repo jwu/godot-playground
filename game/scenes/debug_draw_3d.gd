@@ -1,10 +1,10 @@
 extends Node3D
-## DebugDraw3D：3D 调试绘制演示，FreeCamera + ImmediateMesh 动态绘制
+## DebugDraw3D：3D 调试绘制演示，FreeCamera + 共享 DebugDraw3D 节点
 ##
 ## 相机操作由 res://entities/free_camera.tscn 提供。
 ## Esc 在 Freelook 中退出 Freelook，否则返回主菜单。
-## 展示：坐标轴、XZ 网格(LOD)、3D 线段、线框图元、点标记、方向射线。
 
+const DebugDraw3DNode := preload("res://shared/debug_draw_3d/debug_draw_3d.gd")
 const DESIGN_WIDTH := 1280
 const DESIGN_HEIGHT := 720
 const GRID_HALF := 30
@@ -13,7 +13,7 @@ var _last_info_text := ""
 
 @onready var _free_camera: FreeCamera = $FreeCamera
 @onready var _info_label: Label = $UI/InfoLabel
-@onready var _mesh_instance: MeshInstance3D = $DrawMesh
+@onready var _debug_draw: DebugDraw3DNode = $DebugDraw3D
 
 
 func _ready() -> void:
@@ -23,12 +23,10 @@ func _ready() -> void:
   get_window().content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
   get_window().content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
 
-  _mesh_instance.mesh = ImmediateMesh.new()
-
 
 func _process(_delta: float) -> void:
   _update_info_label()
-  _redraw()
+  _draw_demos()
 
 
 func _input(event: InputEvent) -> void:
@@ -46,260 +44,148 @@ func _update_info_label() -> void:
     _last_info_text = text
 
 
-func _redraw() -> void:
-  var im := _mesh_instance.mesh as ImmediateMesh
-  im.clear_surfaces()
-
-  # 绘制顺序：EndlessGrid3D entity 负责 grid，这里只画调试线框元素。
-  _draw_axes(im)
-  _draw_line_demos(im)
-  _draw_wireframe_demos(im)
-  _draw_point_demos(im)
-  _draw_ray_demos(im)
+func _draw_demos() -> void:
+  _draw_axes()
+  _draw_line_demos()
+  _draw_curve_demos()
+  _draw_flat_shape_demos()
+  _draw_volume_demos()
+  _draw_arrow_demos()
 
 
-# ============================================================
-# 坐标轴（RGB）
-# ============================================================
-func _draw_axes(im: ImmediateMesh) -> void:
+func _draw_axes() -> void:
   var axis_len := float(GRID_HALF) + 2.0
-
-  im.surface_begin(Mesh.PRIMITIVE_LINES)
-
-  # X 轴 — 红色
-  im.surface_set_color(Color.RED)
-  im.surface_add_vertex(Vector3(-axis_len, 0, 0))
-  im.surface_add_vertex(Vector3(axis_len, 0, 0))
-
-  # Y 轴 — 绿色
-  im.surface_set_color(Color.GREEN)
-  im.surface_add_vertex(Vector3(0, -axis_len, 0))
-  im.surface_add_vertex(Vector3(0, axis_len, 0))
-
-  # Z 轴 — 蓝色
-  im.surface_set_color(Color.BLUE)
-  im.surface_add_vertex(Vector3(0, 0, -axis_len))
-  im.surface_add_vertex(Vector3(0, 0, axis_len))
-
-  im.surface_end()
+  _debug_draw.draw_line(Vector3(-axis_len, 0.0, 0.0), Vector3(axis_len, 0.0, 0.0), Color.RED)
+  _debug_draw.draw_line(Vector3(0.0, -axis_len, 0.0), Vector3(0.0, axis_len, 0.0), Color.GREEN)
+  _debug_draw.draw_line(Vector3(0.0, 0.0, -axis_len), Vector3(0.0, 0.0, axis_len), Color.BLUE)
 
 
-# ============================================================
-# 3D 线段演示
-# ============================================================
-func _draw_line_demos(im: ImmediateMesh) -> void:
-  ## 展示空间中不同方向、不同颜色的线段
-  var o := Vector3(-20, 0, -20)
-
-  im.surface_begin(Mesh.PRIMITIVE_LINES)
-
-  # 水平 X
-  im.surface_set_color(Color.WHITE)
-  im.surface_add_vertex(o)
-  im.surface_add_vertex(o + Vector3(8, 0, 0))
-  # 竖直 Y
-  im.surface_set_color(Color.RED)
-  im.surface_add_vertex(o)
-  im.surface_add_vertex(o + Vector3(0, 6, 0))
-  # 深度 Z
-  im.surface_set_color(Color.GREEN)
-  im.surface_add_vertex(o)
-  im.surface_add_vertex(o + Vector3(0, 0, 8))
-  # 斜向
-  im.surface_set_color(Color.CYAN)
-  im.surface_add_vertex(o)
-  im.surface_add_vertex(o + Vector3(5, 3, 4))
-  # 交叉线
-  im.surface_set_color(Color.YELLOW)
-  im.surface_add_vertex(o + Vector3(8, 0, 8))
-  im.surface_add_vertex(o + Vector3(0, 6, 0))
-  # 竖线
-  im.surface_set_color(Color.MAGENTA)
-  im.surface_add_vertex(o + Vector3(8, 0, 0))
-  im.surface_add_vertex(o + Vector3(8, 6, 0))
-  # 平行 Z
-  im.surface_set_color(Color.ORANGE)
-  im.surface_add_vertex(o + Vector3(0, 3, 0))
-  im.surface_add_vertex(o + Vector3(0, 3, 8))
-  # 跳跃线
-  im.surface_set_color(Color.DEEP_SKY_BLUE)
-  im.surface_add_vertex(o + Vector3(0, 0, 8))
-  im.surface_add_vertex(o + Vector3(8, 6, 0))
-
-  im.surface_end()
+func _draw_line_demos() -> void:
+  var origin := Vector3(-20.0, 0.0, -20.0)
+  _debug_draw.draw_line(origin, origin + Vector3(8.0, 0.0, 0.0), Color.WHITE)
+  _debug_draw.draw_line(origin, origin + Vector3(0.0, 6.0, 0.0), Color.RED, DebugDraw3DNode.LineStyle.DASH)
+  _debug_draw.draw_line(origin, origin + Vector3(0.0, 0.0, 8.0), Color.GREEN, DebugDraw3DNode.LineStyle.DOT)
+  _debug_draw.draw_polyline(
+    PackedVector3Array(
+      [
+        origin + Vector3(0.0, 0.0, 8.0),
+        origin + Vector3(3.0, 2.0, 6.0),
+        origin + Vector3(6.0, 1.0, 4.0),
+        origin + Vector3(8.0, 6.0, 0.0),
+      ],
+    ),
+    Color.DEEP_SKY_BLUE,
+  )
 
 
-# ============================================================
-# 线框图元演示
-# ============================================================
-func _draw_wireframe_demos(im: ImmediateMesh) -> void:
-  # 线框立方体
-  _draw_wireframe_cube(im, Vector3(13, 3, -18), 5.0, Color.YELLOW)
-
-  # 线框球体（用三个正交圆表示）
-  var sc := Vector3(0, 5, -18)
-  var sr := 4.0
-  _draw_circle_3d(im, sc, sr, Vector3.RIGHT, Vector3.FORWARD, Color.GREEN) # XZ 平面
-  _draw_circle_3d(im, sc, sr, Vector3.RIGHT, Vector3.UP, Color.GREEN) # XY 平面
-  _draw_circle_3d(im, sc, sr, Vector3.UP, Vector3.FORWARD, Color.GREEN) # YZ 平面
-
-  # 线框金字塔
-  _draw_wireframe_pyramid(im, Vector3(-10, 9, -18), 6.0, Color.MAGENTA)
-
-
-func _draw_wireframe_cube(im: ImmediateMesh, center: Vector3, size: float, color: Color) -> void:
-  var h := size * 0.5
-  var o := center
-
-  im.surface_begin(Mesh.PRIMITIVE_LINES)
-  im.surface_set_color(color)
-
-  var corners := [
-    o + Vector3(-h, -h, -h),
-    o + Vector3(h, -h, -h),
-    o + Vector3(h, -h, h),
-    o + Vector3(-h, -h, h),
-    o + Vector3(-h, h, -h),
-    o + Vector3(h, h, -h),
-    o + Vector3(h, h, h),
-    o + Vector3(-h, h, h),
-  ]
-  var c := corners # 简写
-
-  # 底面
-  im.surface_add_vertex(c[0])
-  im.surface_add_vertex(c[1])
-  im.surface_add_vertex(c[1])
-  im.surface_add_vertex(c[2])
-  im.surface_add_vertex(c[2])
-  im.surface_add_vertex(c[3])
-  im.surface_add_vertex(c[3])
-  im.surface_add_vertex(c[0])
-  # 顶面
-  im.surface_add_vertex(c[4])
-  im.surface_add_vertex(c[5])
-  im.surface_add_vertex(c[5])
-  im.surface_add_vertex(c[6])
-  im.surface_add_vertex(c[6])
-  im.surface_add_vertex(c[7])
-  im.surface_add_vertex(c[7])
-  im.surface_add_vertex(c[4])
-  # 竖边
-  im.surface_add_vertex(c[0])
-  im.surface_add_vertex(c[4])
-  im.surface_add_vertex(c[1])
-  im.surface_add_vertex(c[5])
-  im.surface_add_vertex(c[2])
-  im.surface_add_vertex(c[6])
-  im.surface_add_vertex(c[3])
-  im.surface_add_vertex(c[7])
-
-  im.surface_end()
-
-
-func _draw_circle_3d(im: ImmediateMesh, center: Vector3, radius: float, axis_u: Vector3, axis_v: Vector3, color: Color) -> void:
-  ## 在 3D 空间中绘制圆（由 axis_u 和 axis_v 张成的平面内）
-  var segments := 64
-  im.surface_begin(Mesh.PRIMITIVE_LINE_STRIP)
-  im.surface_set_color(color)
-  for i in range(segments + 1):
-    var angle := TAU * float(i) / float(segments)
-    im.surface_add_vertex(center + axis_u * radius * cos(angle) + axis_v * radius * sin(angle))
-  im.surface_end()
-
-
-func _draw_wireframe_pyramid(im: ImmediateMesh, apex: Vector3, base_size: float, color: Color) -> void:
-  var h := base_size * 0.5
-  var b := [
-    apex + Vector3(-h, -base_size, -h),
-    apex + Vector3(h, -base_size, -h),
-    apex + Vector3(h, -base_size, h),
-    apex + Vector3(-h, -base_size, h),
-  ]
-
-  im.surface_begin(Mesh.PRIMITIVE_LINES)
-  im.surface_set_color(color)
-  # 底面
-  im.surface_add_vertex(b[0])
-  im.surface_add_vertex(b[1])
-  im.surface_add_vertex(b[1])
-  im.surface_add_vertex(b[2])
-  im.surface_add_vertex(b[2])
-  im.surface_add_vertex(b[3])
-  im.surface_add_vertex(b[3])
-  im.surface_add_vertex(b[0])
-  # 顶点连线
-  im.surface_add_vertex(b[0])
-  im.surface_add_vertex(apex)
-  im.surface_add_vertex(b[1])
-  im.surface_add_vertex(apex)
-  im.surface_add_vertex(b[2])
-  im.surface_add_vertex(apex)
-  im.surface_add_vertex(b[3])
-  im.surface_add_vertex(apex)
-  im.surface_end()
-
-
-# ============================================================
-# 点标记演示
-# ============================================================
-func _draw_point_demos(im: ImmediateMesh) -> void:
-  ## 用小十字标记 3D 空间中的点
+func _draw_curve_demos() -> void:
   var points := PackedVector3Array(
     [
-      Vector3(18, 0.5, -14),
-      Vector3(20, 2.5, -10),
-      Vector3(22, 1.5, -6),
-      Vector3(18, 4.0, -2),
+      Vector3(-20.0, 0.0, 6.0),
+      Vector3(-16.0, 4.0, 8.0),
+      Vector3(-12.0, 1.0, 12.0),
+      Vector3(-8.0, 5.0, 10.0),
     ],
   )
-  var colors := PackedColorArray([Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW])
-  var cross := 0.5
-
-  im.surface_begin(Mesh.PRIMITIVE_LINES)
-  for i in points.size():
-    var p: Vector3 = points[i]
-    var col: Color = colors[i]
-    im.surface_set_color(col)
-    im.surface_add_vertex(p + Vector3(-cross, 0, 0))
-    im.surface_add_vertex(p + Vector3(cross, 0, 0))
-    im.surface_add_vertex(p + Vector3(0, -cross, 0))
-    im.surface_add_vertex(p + Vector3(0, cross, 0))
-    im.surface_add_vertex(p + Vector3(0, 0, -cross))
-    im.surface_add_vertex(p + Vector3(0, 0, cross))
-  im.surface_end()
+  var arrow_points := points.duplicate()
+  arrow_points.append(Vector3(-4.0, 2.0, 12.0))
+  _debug_draw.draw_curve(points, Color.CYAN, DebugDraw3DNode.CurveType.CATMULL_ROM)
+  _debug_draw.draw_arrow_curve(
+    arrow_points,
+    Color.YELLOW,
+    DebugDraw3DNode.CurveType.CATMULL_ROM,
+    DebugDraw3DNode.ArrowPointType.PRISMATIC,
+  )
 
 
-# ============================================================
-# 方向射线演示
-# ============================================================
-func _draw_ray_demos(im: ImmediateMesh) -> void:
-  ## 展示从原点发出的带箭头标记的方向射线
-  var o := Vector3(-22, 0, -6)
+func _draw_flat_shape_demos() -> void:
+  _debug_draw.draw_flat_circle(
+    Vector3(10.0, 0.05, 10.0),
+    3.0,
+    Vector3.UP,
+    Color(0.2, 0.8, 1.0, 0.35),
+    DebugDraw3DNode.MeshType.MIXED,
+  )
+  _debug_draw.draw_flat_rect(
+    Vector3(18.0, 2.0, 8.0),
+    Vector2(5.0, 3.0),
+    Vector3.RIGHT,
+    Vector3.UP,
+    Color(1.0, 0.5, 0.1, 0.45),
+    DebugDraw3DNode.MeshType.MIXED,
+  )
+  _debug_draw.draw_flat_triangle(
+    Vector3(11.0, 0.1, 16.0),
+    Vector3(16.0, 0.1, 18.0),
+    Vector3(13.0, 0.1, 22.0),
+    Color.MAGENTA,
+    DebugDraw3DNode.MeshType.WIREFRAME,
+    DebugDraw3DNode.LineStyle.DASH,
+  )
 
-  var dirs := PackedVector3Array([Vector3.RIGHT, Vector3.UP, Vector3.BACK, Vector3(0.7, 0.5, 0.5).normalized()])
-  var cols := PackedColorArray([Color.RED, Color.GREEN, Color.BLUE, Color.ORANGE])
-  var lengths := PackedFloat32Array([6.0, 5.0, 5.0, 5.0])
-  var arrow_size := 0.35
 
-  im.surface_begin(Mesh.PRIMITIVE_LINES)
-  for i in dirs.size():
-    var d: Vector3 = dirs[i]
-    var col: Color = cols[i]
-    var l: float = lengths[i]
-    var end_pt: Vector3 = o + d * l
+func _draw_volume_demos() -> void:
+  _debug_draw.draw_box(
+    Vector3(13.0, 3.0, -18.0),
+    Vector3(5.0, 5.0, 5.0),
+    Color.YELLOW,
+    DebugDraw3DNode.MeshType.WIREFRAME,
+  )
+  _debug_draw.draw_sphere(
+    Vector3(0.0, 5.0, -18.0),
+    4.0,
+    Color.GREEN,
+    DebugDraw3DNode.MeshType.WIREFRAME,
+  )
+  _debug_draw.draw_cylinder(
+    Vector3(-8.0, 3.0, -18.0),
+    2.0,
+    6.0,
+    Color.ORANGE,
+    DebugDraw3DNode.MeshType.MIXED,
+  )
+  _debug_draw.draw_capsule(
+    Vector3(-16.0, 4.0, -18.0),
+    1.5,
+    7.0,
+    Color.CORNFLOWER_BLUE,
+    DebugDraw3DNode.MeshType.WIREFRAME,
+  )
+  _debug_draw.draw_cone(
+    Vector3(22.0, 3.0, -18.0),
+    2.5,
+    6.0,
+    Color.MAGENTA,
+    DebugDraw3DNode.MeshType.WIREFRAME,
+  )
 
-    # 射线本体
-    im.surface_set_color(col)
-    im.surface_add_vertex(o)
-    im.surface_add_vertex(end_pt)
 
-    # 箭头末端十字
-    im.surface_set_color(col.lightened(0.3))
-    im.surface_add_vertex(end_pt + Vector3(-arrow_size, 0, 0))
-    im.surface_add_vertex(end_pt + Vector3(arrow_size, 0, 0))
-    im.surface_add_vertex(end_pt + Vector3(0, -arrow_size, 0))
-    im.surface_add_vertex(end_pt + Vector3(0, arrow_size, 0))
-    im.surface_add_vertex(end_pt + Vector3(0, 0, -arrow_size))
-    im.surface_add_vertex(end_pt + Vector3(0, 0, arrow_size))
-  im.surface_end()
+func _draw_arrow_demos() -> void:
+  var origin := Vector3(-22.0, 0.0, -6.0)
+  _debug_draw.draw_arrow(
+    origin,
+    origin + Vector3.RIGHT * 6.0,
+    Color.RED,
+    DebugDraw3DNode.ArrowPointType.TRIANGLE,
+  )
+  _debug_draw.draw_arrow(
+    origin,
+    origin + Vector3.UP * 5.0,
+    Color.GREEN,
+    DebugDraw3DNode.ArrowPointType.PRISMATIC,
+  )
+  _debug_draw.draw_arrow(
+    origin,
+    origin + Vector3.BACK * 5.0,
+    Color.BLUE,
+    DebugDraw3DNode.ArrowPointType.CIRCLE,
+    DebugDraw3DNode.LineStyle.DASH,
+  )
+  _debug_draw.draw_3d_arrow(
+    Vector3(3.0, 0.5, 12.0),
+    Vector3(8.0, 4.0, 14.0),
+    0.12,
+    Color(1.0, 0.9, 0.2, 0.75),
+    DebugDraw3DNode.ArrowPointType.PRISMATIC,
+    true,
+  )
