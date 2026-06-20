@@ -639,15 +639,16 @@ func _emit_command(command: Dictionary) -> void:
     "arrow_curve":
       var sampled := _sample_curve(command["points"], int(command["curve_type"]))
       if sampled.size() >= 2:
-        var point_width := _arrow_curve_point_width(sampled)
-        var trimmed := _trim_polyline_end(sampled, point_width)
-        _emit_polyline(trimmed, command["color"], int(command["style"]), bool(command["overhead"]))
+        var head_length := _arrow_head_length(sampled[0].distance_to(sampled[sampled.size() - 1]))
+        var trimmed := _trim_polyline_end(sampled, head_length)
+        _emit_polyline(sampled, command["color"], int(command["style"]), bool(command["overhead"]))
         _emit_arrow_head(
           trimmed[trimmed.size() - 1],
           sampled[sampled.size() - 1],
           command["color"],
           int(command["point_type"]),
           bool(command["overhead"]),
+          head_length,
         )
     "flat_circle":
       _emit_flat_circle(
@@ -882,6 +883,7 @@ func _emit_arrow_head(
     color: Color,
     point_type: int,
     overhead: bool,
+    head_length_override: float = -1.0,
 ) -> void:
   if point_type == ArrowPointType.NONE:
     return
@@ -894,7 +896,9 @@ func _emit_arrow_head(
   var axes := _axes_for_normal(n)
   var u: Vector3 = axes[0]
   var v: Vector3 = axes[1]
-  var head_length := minf(length * 0.25, 0.8)
+  var head_length := _arrow_head_length(length)
+  if head_length_override > 0.0:
+    head_length = head_length_override
   var head_radius := head_length * 0.45
   var base := to - n * head_length
 
@@ -1788,10 +1792,7 @@ func _curve_segment_count_bezier(p0: Vector3, p1: Vector3, p2: Vector3, p3: Vect
 
 
 func _curve_segment_count_polyline(points: PackedVector3Array) -> int:
-  var length := 0.0
-  for i in range(points.size() - 1):
-    length += points[i].distance_to(points[i + 1])
-  return maxi(1, floori(length / CURVE_3D_SEGMENT_LENGTH))
+  return maxi(1, floori(_polyline_length(points) / CURVE_3D_SEGMENT_LENGTH))
 
 
 func _approximate_bezier_length(p0: Vector3, p1: Vector3, p2: Vector3, p3: Vector3) -> float:
@@ -1804,11 +1805,15 @@ func _approximate_bezier_length(p0: Vector3, p1: Vector3, p2: Vector3, p3: Vecto
   return length
 
 
-func _arrow_curve_point_width(points: PackedVector3Array) -> float:
-  if points.size() < 2:
-    return 0.0
-  var last_length := points[points.size() - 2].distance_to(points[points.size() - 1])
-  return maxf(last_length * 0.25, 0.1)
+func _arrow_head_length(length: float) -> float:
+  return minf(length * 0.25, 0.8)
+
+
+func _polyline_length(points: PackedVector3Array) -> float:
+  var length := 0.0
+  for i in range(points.size() - 1):
+    length += points[i].distance_to(points[i + 1])
+  return length
 
 
 func _trim_polyline_end(points: PackedVector3Array, distance: float) -> PackedVector3Array:

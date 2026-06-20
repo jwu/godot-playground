@@ -9,6 +9,7 @@ const DESIGN_WIDTH := 1280
 const DESIGN_HEIGHT := 720
 const LABEL_FONT_SIZE := 18
 const LABEL_PIXEL_SIZE := 0.008
+const DEMO_COLUMN_GAP := 2.0
 
 var _last_info_text := ""
 var _demo_labels: Node3D
@@ -27,6 +28,10 @@ func _ready() -> void:
   get_window().content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
   _setup_origin_axes_labels()
   _setup_draw_line_labels()
+  _setup_draw_polyline_labels()
+  _setup_draw_curve_labels()
+  _setup_draw_arrow_labels()
+  _setup_draw_arrow_curve_labels()
   _update_info_label()
 
 
@@ -34,6 +39,10 @@ func _process(_delta: float) -> void:
   _update_info_label()
   _draw_origin_axes()
   _draw_line_demos()
+  _draw_polyline_demos()
+  _draw_curve_demos()
+  _draw_arrow_demos()
+  _draw_arrow_curve_demos()
 
 
 func _input(event: InputEvent) -> void:
@@ -88,6 +97,175 @@ func _draw_line_demos() -> void:
   )
 
 
+func _draw_polyline_demos() -> void:
+  var draw_line_end_x := 3.0
+  var origin := Vector3(draw_line_end_x + DEMO_COLUMN_GAP, 0.1, -1.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+
+  _debug_draw.draw_polyline(_make_polyline_points(origin), Color.WHITE)
+  _debug_draw.draw_polyline(
+    _make_polyline_points(origin + row_gap),
+    Color.RED,
+    DebugDraw3DNode.LineStyle.DASH,
+  )
+  _debug_draw.draw_polyline(
+    _make_polyline_points(origin + row_gap * 2.0),
+    Color.GREEN,
+    DebugDraw3DNode.LineStyle.DOT,
+  )
+  _debug_draw.draw_polyline(
+    _make_polyline_points(origin + row_gap * 3.0),
+    Color.YELLOW,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    true,
+  )
+
+
+func _draw_curve_demos() -> void:
+  var draw_polyline_end_x := 6.8
+  var origin := Vector3(draw_polyline_end_x + DEMO_COLUMN_GAP, 0.1, -1.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+
+  _debug_draw.draw_curve(
+    _make_curve_points(origin),
+    Color.WHITE,
+    DebugDraw3DNode.CurveType.BEZIER,
+  )
+  _debug_draw.draw_curve(
+    _make_curve_points(origin + row_gap),
+    Color.RED,
+    DebugDraw3DNode.CurveType.CATMULL_ROM,
+  )
+  _debug_draw.draw_curve(
+    _make_curve_points(origin + row_gap * 2.0),
+    Color.GREEN,
+    DebugDraw3DNode.CurveType.ROUND_CORNER,
+  )
+  _debug_draw.draw_curve(
+    _make_curve_points(origin + row_gap * 3.0),
+    Color.CYAN,
+    DebugDraw3DNode.CurveType.CLOSED_ROUND_CORNER,
+  )
+  _debug_draw.draw_curve(
+    _make_curve_points(origin + row_gap * 4.0),
+    Color.YELLOW,
+    DebugDraw3DNode.CurveType.LINES,
+  )
+  _debug_draw.draw_curve(
+    _make_curve_points(origin + row_gap * 5.0),
+    Color.MAGENTA,
+    DebugDraw3DNode.CurveType.HERMITE,
+  )
+
+
+func _draw_arrow_demos() -> void:
+  var draw_curve_end_x := 10.6
+  var origin := Vector3(draw_curve_end_x + DEMO_COLUMN_GAP, 0.1, -1.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+  var arrow_delta := Vector3(2.0, 0.0, 0.0)
+
+  _debug_draw.draw_arrow(
+    origin,
+    origin + arrow_delta,
+    Color.WHITE,
+    DebugDraw3DNode.ArrowPointType.NONE,
+  )
+  _debug_draw.draw_arrow(
+    origin + row_gap,
+    origin + row_gap + arrow_delta,
+    Color.RED,
+    DebugDraw3DNode.ArrowPointType.TRIANGLE,
+  )
+  _debug_draw.draw_arrow(
+    origin + row_gap * 2.0,
+    origin + row_gap * 2.0 + arrow_delta,
+    Color.GREEN,
+    DebugDraw3DNode.ArrowPointType.PRISMATIC,
+  )
+  _debug_draw.draw_arrow(
+    origin + row_gap * 3.0,
+    origin + row_gap * 3.0 + arrow_delta,
+    Color.CYAN,
+    DebugDraw3DNode.ArrowPointType.CIRCLE,
+  )
+  _debug_draw.draw_arrow(
+    origin + row_gap * 4.0,
+    origin + row_gap * 4.0 + arrow_delta,
+    Color.YELLOW,
+    DebugDraw3DNode.ArrowPointType.TRIANGLE,
+    DebugDraw3DNode.LineStyle.DASH,
+  )
+  _debug_draw.draw_arrow(
+    origin + row_gap * 5.0,
+    origin + row_gap * 5.0 + arrow_delta,
+    Color.MAGENTA,
+    DebugDraw3DNode.ArrowPointType.TRIANGLE,
+    DebugDraw3DNode.LineStyle.DOT,
+  )
+  _debug_draw.draw_arrow(
+    origin + row_gap * 6.0,
+    origin + row_gap * 6.0 + arrow_delta,
+    Color.ORANGE,
+    DebugDraw3DNode.ArrowPointType.TRIANGLE,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    true,
+  )
+
+
+func _draw_arrow_curve_demos() -> void:
+  var draw_arrow_end_x := 14.6
+  var origin := Vector3(draw_arrow_end_x + DEMO_COLUMN_GAP, 0.1, -1.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+
+  _debug_draw.draw_arrow_curve(
+    _make_curve_points(origin),
+    Color.WHITE,
+    DebugDraw3DNode.CurveType.BEZIER,
+  )
+  _debug_draw.draw_arrow_curve(
+    _make_curve_points(origin + row_gap),
+    Color.RED,
+    DebugDraw3DNode.CurveType.CATMULL_ROM,
+  )
+  _debug_draw.draw_arrow_curve(
+    _make_curve_points(origin + row_gap * 2.0),
+    Color.GREEN,
+    DebugDraw3DNode.CurveType.ROUND_CORNER,
+  )
+  _debug_draw.draw_arrow_curve(
+    _make_curve_points(origin + row_gap * 3.0),
+    Color.CYAN,
+    DebugDraw3DNode.CurveType.CLOSED_ROUND_CORNER,
+  )
+  _debug_draw.draw_arrow_curve(
+    _make_curve_points(origin + row_gap * 4.0),
+    Color.YELLOW,
+    DebugDraw3DNode.CurveType.BEZIER,
+    DebugDraw3DNode.ArrowPointType.PRISMATIC,
+  )
+  _debug_draw.draw_arrow_curve(
+    _make_curve_points(origin + row_gap * 5.0),
+    Color.MAGENTA,
+    DebugDraw3DNode.CurveType.BEZIER,
+    DebugDraw3DNode.ArrowPointType.CIRCLE,
+  )
+  _debug_draw.draw_arrow_curve(
+    _make_curve_points(origin + row_gap * 6.0),
+    Color.ORANGE,
+    DebugDraw3DNode.CurveType.BEZIER,
+    DebugDraw3DNode.ArrowPointType.TRIANGLE,
+    DebugDraw3DNode.LineStyle.DASH,
+  )
+  _debug_draw.draw_arrow_curve(
+    _make_curve_points(origin + row_gap * 7.0),
+    Color.PINK,
+    DebugDraw3DNode.CurveType.BEZIER,
+    DebugDraw3DNode.ArrowPointType.TRIANGLE,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    true,
+  )
+
+
 func _setup_origin_axes_labels() -> void:
   _origin_axes_labels = Node3D.new()
   _origin_axes_labels.name = "OriginAxesLabels"
@@ -112,6 +290,90 @@ func _setup_draw_line_labels() -> void:
   _add_demo_label("DrawLineDashLabel", "style=DASH", origin + row_gap + label_anchor_offset)
   _add_demo_label("DrawLineDotLabel", "style=DOT", origin + row_gap * 2.0 + label_anchor_offset)
   _add_demo_label("DrawLineOverheadLabel", "overhead=true", origin + row_gap * 3.0 + label_anchor_offset)
+
+
+func _setup_draw_polyline_labels() -> void:
+  var draw_line_end_x := 3.0
+  var origin := Vector3(draw_line_end_x + DEMO_COLUMN_GAP, 0.1, -1.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+  var label_anchor_offset := Vector3(-0.1, 0.0, 0.0)
+
+  _add_demo_label("DrawPolylineTitle", "draw_polyline", origin + Vector3(-0.1, 0.0, 0.5))
+  _add_demo_label("DrawPolylineDefaultLabel", "style=DEFAULT", origin + label_anchor_offset)
+  _add_demo_label("DrawPolylineDashLabel", "style=DASH", origin + row_gap + label_anchor_offset)
+  _add_demo_label("DrawPolylineDotLabel", "style=DOT", origin + row_gap * 2.0 + label_anchor_offset)
+  _add_demo_label("DrawPolylineOverheadLabel", "overhead=true", origin + row_gap * 3.0 + label_anchor_offset)
+
+
+func _setup_draw_curve_labels() -> void:
+  var draw_polyline_end_x := 6.8
+  var origin := Vector3(draw_polyline_end_x + DEMO_COLUMN_GAP, 0.1, -1.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+  var label_anchor_offset := Vector3(-0.1, 0.0, 0.0)
+
+  _add_demo_label("DrawCurveTitle", "draw_curve", origin + Vector3(-0.1, 0.0, 0.5))
+  _add_demo_label("DrawCurveBezierLabel", "curve_type=BEZIER", origin + label_anchor_offset)
+  _add_demo_label("DrawCurveCatmullRomLabel", "curve_type=CATMULL_ROM", origin + row_gap + label_anchor_offset)
+  _add_demo_label("DrawCurveRoundCornerLabel", "curve_type=ROUND_CORNER", origin + row_gap * 2.0 + label_anchor_offset)
+  _add_demo_label("DrawCurveClosedRoundCornerLabel", "curve_type=CLOSED_ROUND_CORNER", origin + row_gap * 3.0 + label_anchor_offset)
+  _add_demo_label("DrawCurveLinesLabel", "curve_type=LINES", origin + row_gap * 4.0 + label_anchor_offset)
+  _add_demo_label("DrawCurveHermiteLabel", "curve_type=HERMITE", origin + row_gap * 5.0 + label_anchor_offset)
+
+
+func _setup_draw_arrow_labels() -> void:
+  var draw_curve_end_x := 10.6
+  var origin := Vector3(draw_curve_end_x + DEMO_COLUMN_GAP, 0.1, -1.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+  var label_anchor_offset := Vector3(-0.1, 0.0, 0.0)
+
+  _add_demo_label("DrawArrowTitle", "draw_arrow", origin + Vector3(-0.1, 0.0, 0.5))
+  _add_demo_label("DrawArrowNoneLabel", "point_type=NONE", origin + label_anchor_offset)
+  _add_demo_label("DrawArrowTriangleLabel", "point_type=TRIANGLE", origin + row_gap + label_anchor_offset)
+  _add_demo_label("DrawArrowPrismaticLabel", "point_type=PRISMATIC", origin + row_gap * 2.0 + label_anchor_offset)
+  _add_demo_label("DrawArrowCircleLabel", "point_type=CIRCLE", origin + row_gap * 3.0 + label_anchor_offset)
+  _add_demo_label("DrawArrowDashLabel", "style=DASH", origin + row_gap * 4.0 + label_anchor_offset)
+  _add_demo_label("DrawArrowDotLabel", "style=DOT", origin + row_gap * 5.0 + label_anchor_offset)
+  _add_demo_label("DrawArrowOverheadLabel", "overhead=true", origin + row_gap * 6.0 + label_anchor_offset)
+
+
+func _setup_draw_arrow_curve_labels() -> void:
+  var draw_arrow_end_x := 14.6
+  var origin := Vector3(draw_arrow_end_x + DEMO_COLUMN_GAP, 0.1, -1.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+  var label_anchor_offset := Vector3(-0.1, 0.0, 0.0)
+
+  _add_demo_label("DrawArrowCurveTitle", "draw_arrow_curve", origin + Vector3(-0.1, 0.0, 0.5))
+  _add_demo_label("DrawArrowCurveBezierLabel", "curve_type=BEZIER", origin + label_anchor_offset)
+  _add_demo_label("DrawArrowCurveCatmullRomLabel", "curve_type=CATMULL_ROM", origin + row_gap + label_anchor_offset)
+  _add_demo_label("DrawArrowCurveRoundCornerLabel", "curve_type=ROUND_CORNER", origin + row_gap * 2.0 + label_anchor_offset)
+  _add_demo_label("DrawArrowCurveClosedRoundCornerLabel", "curve_type=CLOSED_ROUND_CORNER", origin + row_gap * 3.0 + label_anchor_offset)
+  _add_demo_label("DrawArrowCurvePrismaticLabel", "point_type=PRISMATIC", origin + row_gap * 4.0 + label_anchor_offset)
+  _add_demo_label("DrawArrowCurveCircleLabel", "point_type=CIRCLE", origin + row_gap * 5.0 + label_anchor_offset)
+  _add_demo_label("DrawArrowCurveDashLabel", "style=DASH", origin + row_gap * 6.0 + label_anchor_offset)
+  _add_demo_label("DrawArrowCurveOverheadLabel", "overhead=true", origin + row_gap * 7.0 + label_anchor_offset)
+
+
+func _make_polyline_points(origin: Vector3) -> PackedVector3Array:
+  return PackedVector3Array(
+    [
+      origin,
+      origin + Vector3(0.45, 0.45, 0.0),
+      origin + Vector3(0.9, 0.0, 0.0),
+      origin + Vector3(1.35, 0.45, 0.0),
+      origin + Vector3(1.8, 0.0, 0.0),
+    ],
+  )
+
+
+func _make_curve_points(origin: Vector3) -> PackedVector3Array:
+  return PackedVector3Array(
+    [
+      origin,
+      origin + Vector3(0.45, 0.65, 0.0),
+      origin + Vector3(1.35, -0.35, 0.0),
+      origin + Vector3(1.8, 0.3, 0.0),
+    ],
+  )
 
 
 func _add_axis_label(label_name: String, text: String, label_position: Vector3, color: Color) -> Label3D:

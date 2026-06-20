@@ -87,6 +87,108 @@ func test_ready_creates_reusable_draw_line_labels() -> void:
   assert_int(same_title_label.get_instance_id()).is_equal(title_instance_id)
 
 
+func test_ready_creates_draw_curve_labels() -> void:
+  var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
+  add_child(scene)
+  await get_tree().process_frame
+
+  var title_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawCurveTitle") as Label3D
+  var bezier_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawCurveBezierLabel") as Label3D
+  var catmull_rom_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawCurveCatmullRomLabel") as Label3D
+  var round_corner_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawCurveRoundCornerLabel") as Label3D
+  var closed_round_corner_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawCurveClosedRoundCornerLabel") as Label3D
+  var lines_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawCurveLinesLabel") as Label3D
+  var hermite_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawCurveHermiteLabel") as Label3D
+
+  assert_object(title_label).is_not_null()
+  assert_object(bezier_label).is_not_null()
+  assert_object(catmull_rom_label).is_not_null()
+  assert_object(round_corner_label).is_not_null()
+  assert_object(closed_round_corner_label).is_not_null()
+  assert_object(lines_label).is_not_null()
+  assert_object(hermite_label).is_not_null()
+  assert_str(title_label.text).contains("draw_curve")
+  assert_str(bezier_label.text).contains("BEZIER")
+  assert_str(catmull_rom_label.text).contains("CATMULL_ROM")
+  assert_str(round_corner_label.text).contains("ROUND_CORNER")
+  assert_str(closed_round_corner_label.text).contains("CLOSED_ROUND_CORNER")
+  assert_str(lines_label.text).contains("LINES")
+  assert_str(hermite_label.text).contains("HERMITE")
+  assert_int(bezier_label.horizontal_alignment).is_equal(HORIZONTAL_ALIGNMENT_RIGHT)
+  assert_vector(title_label.position).is_equal(Vector3(8.7, 0.1, -0.5))
+
+
+func test_ready_creates_draw_arrow_labels() -> void:
+  var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
+  add_child(scene)
+  await get_tree().process_frame
+
+  var title_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawArrowTitle") as Label3D
+  var none_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawArrowNoneLabel") as Label3D
+  var triangle_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawArrowTriangleLabel") as Label3D
+  var prismatic_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawArrowPrismaticLabel") as Label3D
+  var circle_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawArrowCircleLabel") as Label3D
+  var dash_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawArrowDashLabel") as Label3D
+  var dot_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawArrowDotLabel") as Label3D
+  var overhead_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawArrowOverheadLabel") as Label3D
+
+  assert_object(title_label).is_not_null()
+  assert_object(none_label).is_not_null()
+  assert_object(triangle_label).is_not_null()
+  assert_object(prismatic_label).is_not_null()
+  assert_object(circle_label).is_not_null()
+  assert_object(dash_label).is_not_null()
+  assert_object(dot_label).is_not_null()
+  assert_object(overhead_label).is_not_null()
+  assert_str(title_label.text).contains("draw_arrow")
+  assert_str(none_label.text).contains("NONE")
+  assert_str(triangle_label.text).contains("TRIANGLE")
+  assert_str(prismatic_label.text).contains("PRISMATIC")
+  assert_str(circle_label.text).contains("CIRCLE")
+  assert_str(dash_label.text).contains("DASH")
+  assert_str(dot_label.text).contains("DOT")
+  assert_str(overhead_label.text).contains("overhead=true")
+  assert_int(none_label.horizontal_alignment).is_equal(HORIZONTAL_ALIGNMENT_RIGHT)
+  assert_vector(title_label.position).is_equal(Vector3(12.5, 0.1, -0.5))
+
+
+func test_ready_creates_draw_arrow_curve_labels() -> void:
+  var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
+  add_child(scene)
+  await get_tree().process_frame
+
+  var title_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawArrowCurveTitle") as Label3D
+  var bezier_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawArrowCurveBezierLabel") as Label3D
+  var catmull_rom_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawArrowCurveCatmullRomLabel") as Label3D
+  var round_corner_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawArrowCurveRoundCornerLabel") as Label3D
+  var closed_round_corner_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawArrowCurveClosedRoundCornerLabel") as Label3D
+  var prismatic_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawArrowCurvePrismaticLabel") as Label3D
+  var circle_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawArrowCurveCircleLabel") as Label3D
+  var dash_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawArrowCurveDashLabel") as Label3D
+  var overhead_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawArrowCurveOverheadLabel") as Label3D
+
+  assert_object(title_label).is_not_null()
+  assert_object(bezier_label).is_not_null()
+  assert_object(catmull_rom_label).is_not_null()
+  assert_object(round_corner_label).is_not_null()
+  assert_object(closed_round_corner_label).is_not_null()
+  assert_object(prismatic_label).is_not_null()
+  assert_object(circle_label).is_not_null()
+  assert_object(dash_label).is_not_null()
+  assert_object(overhead_label).is_not_null()
+  assert_str(title_label.text).contains("draw_arrow_curve")
+  assert_str(bezier_label.text).contains("BEZIER")
+  assert_str(catmull_rom_label.text).contains("CATMULL_ROM")
+  assert_str(round_corner_label.text).contains("ROUND_CORNER")
+  assert_str(closed_round_corner_label.text).contains("CLOSED_ROUND_CORNER")
+  assert_str(prismatic_label.text).contains("PRISMATIC")
+  assert_str(circle_label.text).contains("CIRCLE")
+  assert_str(dash_label.text).contains("DASH")
+  assert_str(overhead_label.text).contains("overhead=true")
+  assert_int(bezier_label.horizontal_alignment).is_equal(HORIZONTAL_ALIGNMENT_RIGHT)
+  assert_vector(title_label.position).is_equal(Vector3(16.5, 0.1, -0.5))
+
+
 func test_ui_info_keeps_camera_state_without_operation_help() -> void:
   var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
   add_child(scene)
