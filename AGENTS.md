@@ -77,6 +77,20 @@ project/
 
 - 动手前请先阅读 `WORKFLOW.md`
 
+### 问题追踪 Issue tracker
+
+Issue 在 GitHub Issues 中跟踪；外部 PR 不作为 triage 请求入口。详见 `docs/agents/issue-tracker.md`。
+
+### 标签分类 Triage labels
+
+Triage 标签使用默认的五类规范词汇。详见 `docs/agents/triage-labels.md`。
+
+### 领域文档 Domain docs
+
+领域文档使用 single-context 布局。详见 `docs/agents/domain.md`。
+
+- `CONTEXT.md` 中的词汇条目统一使用 `中文（English）` 形式，例如 `调试绘制（Debug Draw）`。
+
 ## 协作规则
 
 ### 编辑
