@@ -76,6 +76,24 @@ func _draw_line_demos() -> void:
     ),
     Color.DEEP_SKY_BLUE,
   )
+  _debug_draw.draw_cylinder_line(
+    origin + Vector3(10.0, 0.0, 0.0),
+    origin + Vector3(10.0, 5.0, 5.0),
+    0.12,
+    Color.ORANGE,
+    DebugDraw3DNode.MeshType.MIXED,
+  )
+  _debug_draw.draw_cylinder_polyline(
+    PackedVector3Array(
+      [
+        origin + Vector3(12.0, 0.0, 0.0),
+        origin + Vector3(13.0, 2.0, 2.0),
+        origin + Vector3(16.0, 1.0, 4.0),
+      ],
+    ),
+    0.1,
+    Color.LIGHT_GREEN,
+  )
 
 
 func _draw_curve_demos() -> void:
@@ -93,6 +111,20 @@ func _draw_curve_demos() -> void:
   _debug_draw.draw_arrow_curve(
     arrow_points,
     Color.YELLOW,
+    DebugDraw3DNode.CurveType.CATMULL_ROM,
+    DebugDraw3DNode.ArrowPointType.PRISMATIC,
+  )
+  _debug_draw.draw_cylinder_curve(
+    points,
+    0.08,
+    Color(0.4, 1.0, 0.6, 0.8),
+    DebugDraw3DNode.CurveType.BEZIER,
+    DebugDraw3DNode.MeshType.MIXED,
+  )
+  _debug_draw.draw_cylinder_arrow_curve(
+    arrow_points,
+    0.08,
+    Color(1.0, 0.6, 0.2, 0.85),
     DebugDraw3DNode.CurveType.CATMULL_ROM,
     DebugDraw3DNode.ArrowPointType.PRISMATIC,
   )

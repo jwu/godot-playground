@@ -131,6 +131,17 @@ func draw_line(
   )
 
 
+func draw_line_3d(
+    from: Vector3,
+    to: Vector3,
+    color: Color = Color.WHITE,
+    style: LineStyle = LineStyle.DEFAULT,
+    overhead: bool = false,
+    layer: int = DEFAULT_LAYER,
+) -> void:
+  draw_line(from, to, color, style, overhead, layer)
+
+
 func draw_polyline(
     points: PackedVector3Array,
     color: Color = Color.WHITE,
@@ -148,6 +159,16 @@ func draw_polyline(
       "layer": layer,
     },
   )
+
+
+func draw_polyline_3d(
+    points: PackedVector3Array,
+    color: Color = Color.WHITE,
+    style: LineStyle = LineStyle.DEFAULT,
+    overhead: bool = false,
+    layer: int = DEFAULT_LAYER,
+) -> void:
+  draw_polyline(points, color, style, overhead, layer)
 
 
 func draw_curve(
@@ -359,6 +380,33 @@ func draw_cylinder_curve(
       "radius": radius,
       "color": color,
       "curve_type": curve_type,
+      "mesh_type": mesh_type,
+      "style": style,
+      "overhead": overhead,
+      "layer": layer,
+    },
+  )
+
+
+func draw_cylinder_arrow_curve(
+    points: PackedVector3Array,
+    radius: float,
+    color: Color = Color.WHITE,
+    curve_type: CurveType = CurveType.CATMULL_ROM,
+    point_type: ArrowPointType = ArrowPointType.PRISMATIC,
+    mesh_type: MeshType = MeshType.SOLID,
+    style: LineStyle = LineStyle.DEFAULT,
+    overhead: bool = false,
+    layer: int = DEFAULT_LAYER,
+) -> void:
+  _commands.append(
+    {
+      "type": "cylinder_arrow_curve",
+      "points": points,
+      "radius": radius,
+      "color": color,
+      "curve_type": curve_type,
+      "point_type": point_type,
       "mesh_type": mesh_type,
       "style": style,
       "overhead": overhead,
@@ -685,6 +733,25 @@ func _emit_command(command: Dictionary) -> void:
         int(command["style"]),
         bool(command["overhead"]),
       )
+    "cylinder_arrow_curve":
+      var sampled_curve := _sample_curve(command["points"], int(command["curve_type"]))
+      _emit_cylinder_polyline(
+        sampled_curve,
+        float(command["radius"]),
+        command["color"],
+        int(command["mesh_type"]),
+        int(command["style"]),
+        bool(command["overhead"]),
+      )
+      if sampled_curve.size() >= 2:
+        _emit_arrow_3d(
+          sampled_curve[sampled_curve.size() - 2],
+          sampled_curve[sampled_curve.size() - 1],
+          float(command["radius"]),
+          command["color"],
+          int(command["point_type"]),
+          bool(command["overhead"]),
+        )
     "arrow_3d":
       _emit_arrow_3d(
         command["from"],

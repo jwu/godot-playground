@@ -60,6 +60,82 @@ func test_overhead_draw_uses_no_depth_mesh() -> void:
   assert_bool(material.no_depth_test).is_true()
 
 
+func test_line_and_polyline_families_render() -> void:
+  var debug_draw: DebugDraw3DNode = auto_free(DEBUG_DRAW_3D_SHARED_SCENE.instantiate()) as DebugDraw3DNode
+  add_child(debug_draw)
+  await get_tree().process_frame
+
+  debug_draw.draw_line_3d(Vector3.ZERO, Vector3.RIGHT, Color.RED)
+  debug_draw.draw_polyline(
+    PackedVector3Array([Vector3.ZERO, Vector3.UP, Vector3(1.0, 1.0, 0.0)]),
+    Color.GREEN,
+    DebugDraw3DNode.LineStyle.DASH,
+  )
+  debug_draw.draw_polyline_3d(
+    PackedVector3Array([Vector3(1.0, 0.0, 0.0), Vector3(1.0, 1.0, 0.0)]),
+    Color.ORANGE,
+  )
+  debug_draw.draw_cylinder_line(Vector3(2.0, 0.0, 0.0), Vector3(2.0, 1.0, 0.0), 0.1, Color.BLUE)
+  debug_draw.draw_cylinder_polyline(
+    PackedVector3Array([Vector3(3.0, 0.0, 0.0), Vector3(3.0, 1.0, 0.0), Vector3(4.0, 1.0, 0.0)]),
+    0.1,
+    Color.YELLOW,
+  )
+  await get_tree().process_frame
+
+  assert_int(debug_draw.get_depth_mesh_instance().mesh.get_surface_count()).is_greater(0)
+
+
+func test_flat_shapes_and_arrow_families_render() -> void:
+  var debug_draw: DebugDraw3DNode = auto_free(DEBUG_DRAW_3D_SHARED_SCENE.instantiate()) as DebugDraw3DNode
+  add_child(debug_draw)
+  await get_tree().process_frame
+
+  debug_draw.draw_arrow(Vector3.ZERO, Vector3.RIGHT, Color.RED, DebugDraw3DNode.ArrowPointType.CIRCLE)
+  debug_draw.draw_3d_arrow(Vector3(0.0, 1.0, 0.0), Vector3(1.0, 1.0, 0.0), 0.08, Color.GREEN)
+  debug_draw.draw_arrow_3d(Vector3(0.0, 2.0, 0.0), Vector3(1.0, 2.0, 0.0), 0.08, Color.CYAN)
+  debug_draw.draw_flat_circle(Vector3(0.0, 0.0, 1.0), 0.5, Vector3.UP, Color.BLUE)
+  debug_draw.draw_flat_rect(Vector3(1.5, 0.0, 1.0), Vector2.ONE, Vector3.RIGHT, Vector3.FORWARD, Color.YELLOW)
+  debug_draw.draw_flat_triangle(Vector3(3.0, 0.0, 1.0), Vector3(4.0, 0.0, 1.0), Vector3(3.5, 0.0, 2.0), Color.MAGENTA)
+  await get_tree().process_frame
+
+  assert_int(debug_draw.get_depth_mesh_instance().mesh.get_surface_count()).is_greater(0)
+
+
+func test_curve_families_render_all_curve_types() -> void:
+  var debug_draw: DebugDraw3DNode = auto_free(DEBUG_DRAW_3D_SHARED_SCENE.instantiate()) as DebugDraw3DNode
+  add_child(debug_draw)
+  await get_tree().process_frame
+
+  var points := PackedVector3Array(
+    [
+      Vector3.ZERO,
+      Vector3(0.5, 1.0, 0.0),
+      Vector3(1.0, 0.0, 0.0),
+      Vector3(1.5, 1.0, 0.0),
+    ],
+  )
+  var curve_types := [
+    DebugDraw3DNode.CurveType.BEZIER,
+    DebugDraw3DNode.CurveType.ROUND_CORNER,
+    DebugDraw3DNode.CurveType.CLOSED_ROUND_CORNER,
+    DebugDraw3DNode.CurveType.CATMULL_ROM,
+    DebugDraw3DNode.CurveType.LINES,
+    DebugDraw3DNode.CurveType.HERMITE,
+  ]
+  for i in curve_types.size():
+    var shifted := PackedVector3Array()
+    for point: Vector3 in points:
+      shifted.append(point + Vector3(float(i) * 2.0, 0.0, 0.0))
+    debug_draw.draw_curve(shifted, Color.CYAN, curve_types[i])
+  debug_draw.draw_arrow_curve(points, Color.YELLOW, DebugDraw3DNode.CurveType.BEZIER)
+  debug_draw.draw_cylinder_curve(points, 0.08, Color.ORANGE, DebugDraw3DNode.CurveType.CATMULL_ROM)
+  debug_draw.draw_cylinder_arrow_curve(points, 0.08, Color.GREEN, DebugDraw3DNode.CurveType.CATMULL_ROM)
+  await get_tree().process_frame
+
+  assert_int(debug_draw.get_depth_mesh_instance().mesh.get_surface_count()).is_greater(0)
+
+
 func test_mesh_types_generate_observable_surfaces() -> void:
   var debug_draw: DebugDraw3DNode = auto_free(DEBUG_DRAW_3D_SHARED_SCENE.instantiate()) as DebugDraw3DNode
   add_child(debug_draw)
@@ -68,6 +144,8 @@ func test_mesh_types_generate_observable_surfaces() -> void:
   debug_draw.draw_box(Vector3.ZERO, Vector3.ONE, Color.RED, DebugDraw3DNode.MeshType.SOLID)
   debug_draw.draw_sphere(Vector3(2.0, 0.0, 0.0), 0.5, Color.GREEN, DebugDraw3DNode.MeshType.WIREFRAME)
   debug_draw.draw_cylinder(Vector3(4.0, 0.0, 0.0), 0.3, 1.0, Color.BLUE, DebugDraw3DNode.MeshType.MIXED)
+  debug_draw.draw_capsule(Vector3(6.0, 0.0, 0.0), 0.3, 1.2, Color.YELLOW, DebugDraw3DNode.MeshType.SOLID)
+  debug_draw.draw_cone(Vector3(8.0, 0.0, 0.0), 0.4, 1.2, Color.MAGENTA, DebugDraw3DNode.MeshType.WIREFRAME)
   await get_tree().process_frame
 
   assert_int(debug_draw.get_depth_mesh_instance().mesh.get_surface_count()).is_greater(1)
