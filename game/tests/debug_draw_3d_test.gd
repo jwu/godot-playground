@@ -37,18 +37,22 @@ func test_ready_uses_shared_debug_draw_node_and_redraws_surfaces() -> void:
   assert_int(debug_draw.get_depth_mesh_instance().mesh.get_surface_count()).is_greater(0)
 
 
-func test_ready_creates_reusable_spatial_labels() -> void:
+func test_ready_creates_reusable_section_labels_as_depth_tested_3d_signs() -> void:
   var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
   add_child(scene)
   await get_tree().process_frame
 
+  var labels_root: Node = scene.get_node_or_null("SpatialLabels")
+  assert_object(labels_root).is_not_null()
+  assert_int(labels_root.get_child_count()).is_equal(6)
+
   var title_label: Label3D = scene.get_node_or_null("SpatialLabels/ApiCoverageTitle") as Label3D
   assert_object(title_label).is_not_null()
   assert_str(title_label.text).contains("API 覆盖样例")
-  assert_int(title_label.billboard).is_equal(BaseMaterial3D.BILLBOARD_ENABLED)
-  assert_bool(title_label.fixed_size).is_true()
-  assert_bool(title_label.no_depth_test).is_true()
-  assert_bool(title_label.shaded).is_false()
+  assert_int(title_label.billboard).is_equal(BaseMaterial3D.BILLBOARD_DISABLED)
+  assert_bool(title_label.fixed_size).is_false()
+  assert_bool(title_label.no_depth_test).is_false()
+  assert_bool(is_equal_approx(absf(title_label.global_basis.z.y), 0.0)).is_true()
 
   var title_instance_id := title_label.get_instance_id()
   await get_tree().process_frame
@@ -57,77 +61,27 @@ func test_ready_creates_reusable_spatial_labels() -> void:
   assert_int(same_title_label.get_instance_id()).is_equal(title_instance_id)
 
 
-func test_line_and_curve_labels_describe_api_coverage() -> void:
+func test_section_labels_cover_major_demo_areas() -> void:
   var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
   add_child(scene)
   await get_tree().process_frame
 
-  var line_label: Label3D = scene.get_node_or_null("SpatialLabels/LineStylesLabel") as Label3D
-  var polyline_label: Label3D = scene.get_node_or_null("SpatialLabels/PolylineLabel") as Label3D
-  var curve_label: Label3D = scene.get_node_or_null("SpatialLabels/CurveTypesLabel") as Label3D
+  var line_label: Label3D = scene.get_node_or_null("SpatialLabels/LinesTitle") as Label3D
+  var curve_label: Label3D = scene.get_node_or_null("SpatialLabels/CurvesTitle") as Label3D
+  var arrow_label: Label3D = scene.get_node_or_null("SpatialLabels/ArrowsTitle") as Label3D
+  var shape_label: Label3D = scene.get_node_or_null("SpatialLabels/ShapesTitle") as Label3D
+  var behavior_label: Label3D = scene.get_node_or_null("SpatialLabels/BehaviorTitle") as Label3D
   assert_object(line_label).is_not_null()
-  assert_object(polyline_label).is_not_null()
   assert_object(curve_label).is_not_null()
-
-  assert_str(line_label.text).contains("draw_line")
-  assert_str(line_label.text).contains("DEFAULT")
-  assert_str(line_label.text).contains("DASH")
-  assert_str(line_label.text).contains("DOT")
-  assert_str(polyline_label.text).contains("draw_polyline")
-  assert_str(curve_label.text).contains("draw_curve")
-  assert_str(curve_label.text).contains("BEZIER")
-  assert_str(curve_label.text).contains("ROUND_CORNER")
-  assert_str(curve_label.text).contains("CLOSED_ROUND_CORNER")
-  assert_str(curve_label.text).contains("CATMULL_ROM")
-  assert_str(curve_label.text).contains("LINES")
-  assert_str(curve_label.text).contains("HERMITE")
-  assert_str(curve_label.text).contains("draw_line_3d")
-  assert_str(curve_label.text).contains("draw_polyline_3d")
-
-
-func test_arrow_labels_describe_api_and_point_type_coverage() -> void:
-  var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
-  add_child(scene)
-  await get_tree().process_frame
-
-  var arrow_label: Label3D = scene.get_node_or_null("SpatialLabels/ArrowTypesLabel") as Label3D
   assert_object(arrow_label).is_not_null()
-  assert_str(arrow_label.text).contains("draw_arrow")
-  assert_str(arrow_label.text).contains("draw_arrow_curve")
-  assert_str(arrow_label.text).contains("draw_3d_arrow")
-  assert_str(arrow_label.text).contains("draw_cylinder_arrow_curve")
-  assert_str(arrow_label.text).contains("NONE")
-  assert_str(arrow_label.text).contains("TRIANGLE")
-  assert_str(arrow_label.text).contains("PRISMATIC")
-  assert_str(arrow_label.text).contains("CIRCLE")
+  assert_object(shape_label).is_not_null()
+  assert_object(behavior_label).is_not_null()
 
-
-func test_shape_labels_describe_api_and_mesh_type_coverage() -> void:
-  var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
-  add_child(scene)
-  await get_tree().process_frame
-
-  var flat_label: Label3D = scene.get_node_or_null("SpatialLabels/FlatShapesLabel") as Label3D
-  var volume_label: Label3D = scene.get_node_or_null("SpatialLabels/VolumeShapesLabel") as Label3D
-  var pipe_label: Label3D = scene.get_node_or_null("SpatialLabels/PipeShapesLabel") as Label3D
-  assert_object(flat_label).is_not_null()
-  assert_object(volume_label).is_not_null()
-  assert_object(pipe_label).is_not_null()
-
-  assert_str(flat_label.text).contains("draw_flat_circle")
-  assert_str(flat_label.text).contains("draw_flat_rect")
-  assert_str(flat_label.text).contains("draw_flat_triangle")
-  assert_str(volume_label.text).contains("draw_box")
-  assert_str(volume_label.text).contains("draw_sphere")
-  assert_str(volume_label.text).contains("draw_cylinder")
-  assert_str(volume_label.text).contains("draw_capsule")
-  assert_str(volume_label.text).contains("draw_cone")
-  assert_str(pipe_label.text).contains("draw_cylinder_line")
-  assert_str(pipe_label.text).contains("draw_cylinder_polyline")
-  assert_str(pipe_label.text).contains("draw_cylinder_curve")
-  assert_str(pipe_label.text).contains("SOLID")
-  assert_str(pipe_label.text).contains("WIREFRAME")
-  assert_str(pipe_label.text).contains("MIXED")
+  assert_str(line_label.text).contains("线段")
+  assert_str(curve_label.text).contains("曲线")
+  assert_str(arrow_label.text).contains("箭头")
+  assert_str(shape_label.text).contains("形状")
+  assert_str(behavior_label.text).contains("Layer")
 
 
 func test_layer_key_toggle_changes_visible_layers_and_ui() -> void:

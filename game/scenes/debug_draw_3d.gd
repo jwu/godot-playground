@@ -12,8 +12,8 @@ const LAYER_LINES := 1
 const LAYER_SHAPES := 2
 const LAYER_BEHAVIOR := 4
 const ALL_DEMO_LAYERS := LAYER_LINES | LAYER_SHAPES | LAYER_BEHAVIOR
-const LABEL_FONT_SIZE := 18
-const LABEL_PIXEL_SIZE := 0.003
+const LABEL_FONT_SIZE := 36
+const LABEL_PIXEL_SIZE := 0.02
 const INFO_PREFIX := "DebugDraw3D API 覆盖样例\n基础操作：中键旋转 / Shift+中键平移 / 滚轮缩放 / 右键 Freelook / Esc 返回\n"
 
 var _last_info_text := ""
@@ -417,53 +417,14 @@ func _setup_spatial_labels() -> void:
   _add_spatial_label(
     "ApiCoverageTitle",
     "API 覆盖样例\nDebugDraw3D 绘制能力总览",
-    Vector3(0.0, 8.0, 0.0),
+    Vector3(-5.0, 9.0, 2.0),
+    0.0,
   )
-  _add_spatial_label("LinesTitle", "线段 / 折线", Vector3(-16.0, 5.0, -20.0))
-  _add_spatial_label(
-    "LineStylesLabel",
-    "draw_line\nLineStyle: DEFAULT / DASH / DOT\n别名: draw_line_3d",
-    Vector3(-22.0, 4.0, -18.0),
-  )
-  _add_spatial_label(
-    "PolylineLabel",
-    "draw_polyline\nPackedVector3Array 多段折线\n别名: draw_polyline_3d",
-    Vector3(-12.0, 6.5, -16.0),
-  )
-  _add_spatial_label("CurvesTitle", "曲线 / 箭头曲线", Vector3(-13.0, 7.0, 10.0))
-  _add_spatial_label(
-    "CurveTypesLabel",
-    "draw_curve\nCurveType: BEZIER / ROUND_CORNER / CLOSED_ROUND_CORNER / CATMULL_ROM / LINES / HERMITE\n别名说明: draw_line_3d / draw_polyline_3d 仅说明不重复摆放",
-    Vector3(-10.0, 8.0, 16.0),
-  )
-  _add_spatial_label("ArrowsTitle", "箭头 / 体积箭头", Vector3(-10.0, 7.0, -2.0))
-  _add_spatial_label(
-    "ArrowTypesLabel",
-    "draw_arrow / draw_arrow_curve / draw_3d_arrow / draw_cylinder_arrow_curve\nArrowPointType: NONE / TRIANGLE / PRISMATIC / CIRCLE\n线框箭头与体积箭头对比",
-    Vector3(-8.0, 7.0, 4.0),
-  )
-  _add_spatial_label("ShapesTitle", "平面与体积形状", Vector3(12.0, 7.0, -10.0))
-  _add_spatial_label(
-    "FlatShapesLabel",
-    "draw_flat_circle / draw_flat_rect / draw_flat_triangle\n平面 normal / axis 参数控制朝向\nMeshType: MIXED / WIREFRAME",
-    Vector3(16.0, 6.5, 14.0),
-  )
-  _add_spatial_label(
-    "VolumeShapesLabel",
-    "draw_box / draw_sphere / draw_cylinder / draw_capsule / draw_cone\n常用碰撞体调试体积\nMeshType: SOLID / WIREFRAME / MIXED",
-    Vector3(2.0, 9.0, -18.0),
-  )
-  _add_spatial_label(
-    "PipeShapesLabel",
-    "draw_cylinder_line / draw_cylinder_polyline / draw_cylinder_curve\n粗线、粗折线、粗曲线\nMeshType: SOLID / WIREFRAME / MIXED",
-    Vector3(4.0, 7.0, 0.0),
-  )
-  _add_spatial_label("BehaviorTitle", "渲染行为 / Layer", Vector3(20.0, 8.0, 0.0))
-  _add_spatial_label(
-    "OverheadLayerLabel",
-    "depth-tested vs overhead\n数字键 1/2/3 切换 layer\nLayer 1: 线段曲线  2: 形状管线  3: 坐标轴与行为",
-    Vector3(22.0, 6.0, 6.0),
-  )
+  _add_spatial_label("LinesTitle", "线段 / 折线", Vector3(-22.0, 4.0, -22.0), 20.0)
+  _add_spatial_label("CurvesTitle", "曲线", Vector3(-22.0, 7.0, 14.0), 20.0)
+  _add_spatial_label("ArrowsTitle", "箭头 / 体积箭头", Vector3(-22.0, 6.0, -4.0), 20.0)
+  _add_spatial_label("ShapesTitle", "平面 / 体积 / 管线形状", Vector3(12.0, 8.0, -22.0), -20.0)
+  _add_spatial_label("BehaviorTitle", "渲染行为 / Layer", Vector3(18.0, 7.0, 6.0), -35.0)
 
 
 func _draw_behavior_demos() -> void:
@@ -541,14 +502,20 @@ func _offset_points(points: PackedVector3Array, offset: Vector3) -> PackedVector
   return result
 
 
-func _add_spatial_label(label_name: String, text: String, label_position: Vector3) -> Label3D:
+func _add_spatial_label(
+    label_name: String,
+    text: String,
+    label_position: Vector3,
+    yaw_degrees: float,
+) -> Label3D:
   var label := Label3D.new()
   label.name = label_name
   label.text = text
   label.position = label_position
-  label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-  label.fixed_size = true
-  label.no_depth_test = true
+  label.rotation_degrees = Vector3(0.0, yaw_degrees, 0.0)
+  label.billboard = BaseMaterial3D.BILLBOARD_DISABLED
+  label.fixed_size = false
+  label.no_depth_test = false
   label.shaded = false
   label.double_sided = true
   label.font_size = LABEL_FONT_SIZE
