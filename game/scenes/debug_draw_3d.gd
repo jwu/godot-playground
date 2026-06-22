@@ -32,6 +32,11 @@ func _ready() -> void:
   _setup_draw_curve_labels()
   _setup_draw_arrow_labels()
   _setup_draw_arrow_curve_labels()
+  _setup_draw_flat_circle_labels()
+  _setup_draw_flat_shape_labels()
+  _setup_draw_cylinder_path_labels()
+  _setup_draw_arrow_3d_labels()
+  _setup_draw_solid_shape_labels()
   _update_info_label()
 
 
@@ -43,6 +48,11 @@ func _process(_delta: float) -> void:
   _draw_curve_demos()
   _draw_arrow_demos()
   _draw_arrow_curve_demos()
+  _draw_flat_circle_demos()
+  _draw_flat_shape_demos()
+  _draw_cylinder_path_demos()
+  _draw_arrow_3d_demos()
+  _draw_solid_shape_demos()
 
 
 func _input(event: InputEvent) -> void:
@@ -266,6 +276,259 @@ func _draw_arrow_curve_demos() -> void:
   )
 
 
+func _draw_flat_circle_demos() -> void:
+  var draw_arrow_curve_end_x := 18.4
+  var origin := Vector3(draw_arrow_curve_end_x + DEMO_COLUMN_GAP, 0.1, -1.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+  var circle_offset := Vector3(0.9, 0.0, 0.0)
+  var radius := 0.45
+
+  _debug_draw.draw_flat_circle(
+    origin + circle_offset,
+    radius,
+    Vector3.UP,
+    Color.WHITE,
+  )
+  _debug_draw.draw_flat_circle(
+    origin + row_gap + circle_offset,
+    radius,
+    Vector3.UP,
+    Color.RED,
+    DebugDraw3DNode.MeshType.SOLID,
+  )
+  _debug_draw.draw_flat_circle(
+    origin + row_gap * 2.0 + circle_offset,
+    radius,
+    Vector3.UP,
+    Color.GREEN,
+    DebugDraw3DNode.MeshType.MIXED,
+  )
+  _debug_draw.draw_flat_circle(
+    origin + row_gap * 3.0 + circle_offset,
+    radius,
+    Vector3.UP,
+    Color.YELLOW,
+    DebugDraw3DNode.MeshType.WIREFRAME,
+    DebugDraw3DNode.LineStyle.DASH,
+  )
+  _debug_draw.draw_flat_circle(
+    origin + row_gap * 4.0 + circle_offset,
+    radius,
+    Vector3.UP,
+    Color.MAGENTA,
+    DebugDraw3DNode.MeshType.WIREFRAME,
+    DebugDraw3DNode.LineStyle.DOT,
+  )
+  _debug_draw.draw_flat_circle(
+    origin + row_gap * 5.0 + circle_offset,
+    radius,
+    Vector3.UP,
+    Color.ORANGE,
+    DebugDraw3DNode.MeshType.WIREFRAME,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    true,
+  )
+
+
+func _draw_flat_shape_demos() -> void:
+  var origin := Vector3(1.0, 0.1, -9.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+  var center_offset := Vector3(0.9, 0.0, 0.0)
+  var axis_u := Vector3.RIGHT
+  var axis_v := Vector3.FORWARD
+
+  _debug_draw.draw_flat_rect(
+    origin + center_offset,
+    Vector2(1.4, 0.8),
+    axis_u,
+    axis_v,
+    Color.WHITE,
+  )
+  _debug_draw.draw_flat_rect(
+    origin + row_gap + center_offset,
+    Vector2(1.4, 0.8),
+    axis_u,
+    axis_v,
+    Color.RED,
+    DebugDraw3DNode.MeshType.SOLID,
+  )
+  _debug_draw.draw_flat_rect(
+    origin + row_gap * 2.0 + center_offset,
+    Vector2(1.4, 0.8),
+    axis_u,
+    axis_v,
+    Color.GREEN,
+    DebugDraw3DNode.MeshType.MIXED,
+  )
+  _debug_draw.draw_flat_triangle(
+    origin + row_gap * 3.0 + Vector3(0.2, 0.0, -0.35),
+    origin + row_gap * 3.0 + Vector3(1.6, 0.0, -0.35),
+    origin + row_gap * 3.0 + Vector3(0.9, 0.0, 0.45),
+    Color.YELLOW,
+  )
+  _debug_draw.draw_flat_triangle(
+    origin + row_gap * 4.0 + Vector3(0.2, 0.0, -0.35),
+    origin + row_gap * 4.0 + Vector3(1.6, 0.0, -0.35),
+    origin + row_gap * 4.0 + Vector3(0.9, 0.0, 0.45),
+    Color.MAGENTA,
+    DebugDraw3DNode.MeshType.SOLID,
+  )
+  _debug_draw.draw_flat_triangle(
+    origin + row_gap * 5.0 + Vector3(0.2, 0.0, -0.35),
+    origin + row_gap * 5.0 + Vector3(1.6, 0.0, -0.35),
+    origin + row_gap * 5.0 + Vector3(0.9, 0.0, 0.45),
+    Color.ORANGE,
+    DebugDraw3DNode.MeshType.WIREFRAME,
+    DebugDraw3DNode.LineStyle.DASH,
+  )
+
+
+func _draw_cylinder_path_demos() -> void:
+  var origin := Vector3(4.8, 0.1, -9.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+  var line_delta := Vector3(2.0, 0.0, 0.0)
+  var radius := 0.08
+
+  _debug_draw.draw_cylinder_line(origin, origin + line_delta, radius, Color.WHITE)
+  _debug_draw.draw_cylinder_line(
+    origin + row_gap,
+    origin + row_gap + line_delta,
+    radius,
+    Color.RED,
+    DebugDraw3DNode.MeshType.SOLID,
+  )
+  _debug_draw.draw_cylinder_polyline(
+    _make_polyline_points(origin + row_gap * 2.0),
+    radius,
+    Color.GREEN,
+    DebugDraw3DNode.MeshType.MIXED,
+  )
+  _debug_draw.draw_cylinder_curve(
+    _make_curve_points(origin + row_gap * 3.0),
+    radius,
+    Color.CYAN,
+    DebugDraw3DNode.CurveType.CATMULL_ROM,
+  )
+  _debug_draw.draw_cylinder_curve(
+    _make_curve_points(origin + row_gap * 4.0),
+    radius,
+    Color.YELLOW,
+    DebugDraw3DNode.CurveType.BEZIER,
+    DebugDraw3DNode.MeshType.WIREFRAME,
+    DebugDraw3DNode.LineStyle.DASH,
+  )
+  _debug_draw.draw_cylinder_arrow_curve(
+    _make_curve_points(origin + row_gap * 5.0),
+    radius,
+    Color.MAGENTA,
+    DebugDraw3DNode.CurveType.CATMULL_ROM,
+  )
+  _debug_draw.draw_cylinder_arrow_curve(
+    _make_curve_points(origin + row_gap * 6.0),
+    radius,
+    Color.ORANGE,
+    DebugDraw3DNode.CurveType.BEZIER,
+    DebugDraw3DNode.ArrowPointType.CIRCLE,
+    DebugDraw3DNode.MeshType.MIXED,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    true,
+  )
+
+
+func _draw_arrow_3d_demos() -> void:
+  var origin := Vector3(8.8, 0.1, -9.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+  var arrow_delta := Vector3(2.0, 0.0, 0.0)
+  var radius := 0.08
+
+  _debug_draw.draw_arrow_3d(
+    origin,
+    origin + arrow_delta,
+    radius,
+    Color.WHITE,
+    DebugDraw3DNode.ArrowPointType.NONE,
+  )
+  _debug_draw.draw_arrow_3d(
+    origin + row_gap,
+    origin + row_gap + arrow_delta,
+    radius,
+    Color.RED,
+    DebugDraw3DNode.ArrowPointType.TRIANGLE,
+  )
+  _debug_draw.draw_arrow_3d(
+    origin + row_gap * 2.0,
+    origin + row_gap * 2.0 + arrow_delta,
+    radius,
+    Color.GREEN,
+    DebugDraw3DNode.ArrowPointType.PRISMATIC,
+  )
+  _debug_draw.draw_arrow_3d(
+    origin + row_gap * 3.0,
+    origin + row_gap * 3.0 + arrow_delta,
+    radius,
+    Color.CYAN,
+    DebugDraw3DNode.ArrowPointType.CIRCLE,
+  )
+  _debug_draw.draw_arrow_3d(
+    origin + row_gap * 4.0,
+    origin + row_gap * 4.0 + arrow_delta,
+    radius,
+    Color.YELLOW,
+    DebugDraw3DNode.ArrowPointType.PRISMATIC,
+    true,
+  )
+
+
+func _draw_solid_shape_demos() -> void:
+  var origin := Vector3(12.8, 0.55, -9.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+
+  _debug_draw.draw_box(origin, Vector3(1.0, 0.9, 0.7), Color.WHITE)
+  _debug_draw.draw_box(
+    origin + row_gap,
+    Vector3(1.0, 0.9, 0.7),
+    Color.RED,
+    DebugDraw3DNode.MeshType.SOLID,
+  )
+  _debug_draw.draw_sphere(
+    origin + row_gap * 2.0,
+    0.45,
+    Color.GREEN,
+    DebugDraw3DNode.MeshType.MIXED,
+  )
+  _debug_draw.draw_cylinder(
+    origin + row_gap * 3.0,
+    0.35,
+    1.0,
+    Color.CYAN,
+    DebugDraw3DNode.MeshType.WIREFRAME,
+  )
+  _debug_draw.draw_capsule(
+    origin + row_gap * 4.0,
+    0.3,
+    1.2,
+    Color.YELLOW,
+    DebugDraw3DNode.MeshType.SOLID,
+  )
+  _debug_draw.draw_cone(
+    origin + row_gap * 5.0,
+    0.4,
+    1.2,
+    Color.MAGENTA,
+    DebugDraw3DNode.MeshType.WIREFRAME,
+  )
+  _debug_draw.draw_cone(
+    origin + row_gap * 6.0,
+    0.4,
+    1.2,
+    Color.ORANGE,
+    DebugDraw3DNode.MeshType.MIXED,
+    Vector3.RIGHT,
+    DebugDraw3DNode.LineStyle.DEFAULT,
+    true,
+  )
+
+
 func _setup_origin_axes_labels() -> void:
   _origin_axes_labels = Node3D.new()
   _origin_axes_labels.name = "OriginAxesLabels"
@@ -351,6 +614,78 @@ func _setup_draw_arrow_curve_labels() -> void:
   _add_demo_label("DrawArrowCurveCircleLabel", "point_type=CIRCLE", origin + row_gap * 5.0 + label_anchor_offset)
   _add_demo_label("DrawArrowCurveDashLabel", "style=DASH", origin + row_gap * 6.0 + label_anchor_offset)
   _add_demo_label("DrawArrowCurveOverheadLabel", "overhead=true", origin + row_gap * 7.0 + label_anchor_offset)
+
+
+func _setup_draw_flat_circle_labels() -> void:
+  var draw_arrow_curve_end_x := 18.4
+  var origin := Vector3(draw_arrow_curve_end_x + DEMO_COLUMN_GAP, 0.1, -1.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+  var label_anchor_offset := Vector3(-0.1, 0.0, 0.0)
+
+  _add_demo_label("DrawFlatCircleTitle", "draw_flat_circle", origin + Vector3(-0.1, 0.0, 0.5))
+  _add_demo_label("DrawFlatCircleWireframeLabel", "mesh_type=WIREFRAME", origin + label_anchor_offset)
+  _add_demo_label("DrawFlatCircleSolidLabel", "mesh_type=SOLID", origin + row_gap + label_anchor_offset)
+  _add_demo_label("DrawFlatCircleMixedLabel", "mesh_type=MIXED", origin + row_gap * 2.0 + label_anchor_offset)
+  _add_demo_label("DrawFlatCircleDashLabel", "style=DASH", origin + row_gap * 3.0 + label_anchor_offset)
+  _add_demo_label("DrawFlatCircleDotLabel", "style=DOT", origin + row_gap * 4.0 + label_anchor_offset)
+  _add_demo_label("DrawFlatCircleOverheadLabel", "overhead=true", origin + row_gap * 5.0 + label_anchor_offset)
+
+
+func _setup_draw_flat_shape_labels() -> void:
+  var origin := Vector3(1.0, 0.1, -9.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+  var label_anchor_offset := Vector3(-0.1, 0.0, 0.0)
+
+  _add_demo_label("DrawFlatShapeTitle", "draw_flat_rect / draw_flat_triangle", origin + Vector3(-0.1, 0.0, 0.5))
+  _add_demo_label("DrawFlatRectWireframeLabel", "rect mesh_type=WIREFRAME", origin + label_anchor_offset)
+  _add_demo_label("DrawFlatRectSolidLabel", "rect mesh_type=SOLID", origin + row_gap + label_anchor_offset)
+  _add_demo_label("DrawFlatRectMixedLabel", "rect mesh_type=MIXED", origin + row_gap * 2.0 + label_anchor_offset)
+  _add_demo_label("DrawFlatTriangleWireframeLabel", "triangle mesh_type=WIREFRAME", origin + row_gap * 3.0 + label_anchor_offset)
+  _add_demo_label("DrawFlatTriangleSolidLabel", "triangle mesh_type=SOLID", origin + row_gap * 4.0 + label_anchor_offset)
+  _add_demo_label("DrawFlatTriangleDashLabel", "triangle style=DASH", origin + row_gap * 5.0 + label_anchor_offset)
+
+
+func _setup_draw_cylinder_path_labels() -> void:
+  var origin := Vector3(4.8, 0.1, -9.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+  var label_anchor_offset := Vector3(-0.1, 0.0, 0.0)
+
+  _add_demo_label("DrawCylinderPathTitle", "draw_cylinder_* path", origin + Vector3(-0.1, 0.0, 0.5))
+  _add_demo_label("DrawCylinderLineWireframeLabel", "line mesh_type=WIREFRAME", origin + label_anchor_offset)
+  _add_demo_label("DrawCylinderLineSolidLabel", "line mesh_type=SOLID", origin + row_gap + label_anchor_offset)
+  _add_demo_label("DrawCylinderPolylineMixedLabel", "polyline mesh_type=MIXED", origin + row_gap * 2.0 + label_anchor_offset)
+  _add_demo_label("DrawCylinderCurveCatmullRomLabel", "curve CATMULL_ROM", origin + row_gap * 3.0 + label_anchor_offset)
+  _add_demo_label("DrawCylinderCurveDashLabel", "curve BEZIER style=DASH", origin + row_gap * 4.0 + label_anchor_offset)
+  _add_demo_label("DrawCylinderArrowCurveLabel", "arrow_curve PRISMATIC", origin + row_gap * 5.0 + label_anchor_offset)
+  _add_demo_label("DrawCylinderArrowCurveOverheadLabel", "arrow_curve overhead=true", origin + row_gap * 6.0 + label_anchor_offset)
+
+
+func _setup_draw_arrow_3d_labels() -> void:
+  var origin := Vector3(8.8, 0.1, -9.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+  var label_anchor_offset := Vector3(-0.1, 0.0, 0.0)
+
+  _add_demo_label("DrawArrow3DTitle", "draw_arrow_3d", origin + Vector3(-0.1, 0.0, 0.5))
+  _add_demo_label("DrawArrow3DNoneLabel", "point_type=NONE", origin + label_anchor_offset)
+  _add_demo_label("DrawArrow3DTriangleLabel", "point_type=TRIANGLE", origin + row_gap + label_anchor_offset)
+  _add_demo_label("DrawArrow3DPrismaticLabel", "point_type=PRISMATIC", origin + row_gap * 2.0 + label_anchor_offset)
+  _add_demo_label("DrawArrow3DCircleLabel", "point_type=CIRCLE", origin + row_gap * 3.0 + label_anchor_offset)
+  _add_demo_label("DrawArrow3DOverheadLabel", "overhead=true", origin + row_gap * 4.0 + label_anchor_offset)
+
+
+func _setup_draw_solid_shape_labels() -> void:
+  var origin := Vector3(12.8, 0.55, -9.0)
+  var row_gap := Vector3(0.0, 0.0, -1.0)
+  var label_anchor_offset := Vector3(-0.1, -0.45, 0.0)
+
+  _add_demo_label("DrawSolidShapeTitle", "draw_box / sphere / cylinder / capsule / cone", origin + Vector3(-0.1, -0.45, 0.5))
+  _add_demo_label("DrawBoxWireframeLabel", "box mesh_type=WIREFRAME", origin + label_anchor_offset)
+  _add_demo_label("DrawBoxSolidLabel", "box mesh_type=SOLID", origin + row_gap + label_anchor_offset)
+  _add_demo_label("DrawSphereMixedLabel", "sphere mesh_type=MIXED", origin + row_gap * 2.0 + label_anchor_offset)
+  _add_demo_label("DrawCylinderWireframeLabel", "cylinder mesh_type=WIREFRAME", origin + row_gap * 3.0 + label_anchor_offset)
+  _add_demo_label("DrawCapsuleSolidLabel", "capsule mesh_type=SOLID", origin + row_gap * 4.0 + label_anchor_offset)
+  _add_demo_label("DrawConeWireframeLabel", "cone mesh_type=WIREFRAME", origin + row_gap * 5.0 + label_anchor_offset)
+  _add_demo_label("DrawConeOverheadLabel", "cone overhead=true axis=RIGHT", origin + row_gap * 6.0 + label_anchor_offset)
 
 
 func _make_polyline_points(origin: Vector3) -> PackedVector3Array:

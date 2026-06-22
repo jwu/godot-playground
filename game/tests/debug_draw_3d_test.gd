@@ -189,6 +189,37 @@ func test_ready_creates_draw_arrow_curve_labels() -> void:
   assert_vector(title_label.position).is_equal(Vector3(16.5, 0.1, -0.5))
 
 
+func test_ready_creates_draw_flat_circle_labels() -> void:
+  var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
+  add_child(scene)
+  await get_tree().process_frame
+
+  var title_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawFlatCircleTitle") as Label3D
+  var wireframe_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawFlatCircleWireframeLabel") as Label3D
+  var solid_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawFlatCircleSolidLabel") as Label3D
+  var mixed_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawFlatCircleMixedLabel") as Label3D
+  var dash_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawFlatCircleDashLabel") as Label3D
+  var dot_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawFlatCircleDotLabel") as Label3D
+  var overhead_label: Label3D = scene.get_node_or_null("DrawLineLabels/DrawFlatCircleOverheadLabel") as Label3D
+
+  assert_object(title_label).is_not_null()
+  assert_object(wireframe_label).is_not_null()
+  assert_object(solid_label).is_not_null()
+  assert_object(mixed_label).is_not_null()
+  assert_object(dash_label).is_not_null()
+  assert_object(dot_label).is_not_null()
+  assert_object(overhead_label).is_not_null()
+  assert_str(title_label.text).contains("draw_flat_circle")
+  assert_str(wireframe_label.text).contains("WIREFRAME")
+  assert_str(solid_label.text).contains("SOLID")
+  assert_str(mixed_label.text).contains("MIXED")
+  assert_str(dash_label.text).contains("DASH")
+  assert_str(dot_label.text).contains("DOT")
+  assert_str(overhead_label.text).contains("overhead=true")
+  assert_int(wireframe_label.horizontal_alignment).is_equal(HORIZONTAL_ALIGNMENT_RIGHT)
+  assert_vector(title_label.position).is_equal(Vector3(20.3, 0.1, -0.5))
+
+
 func test_ui_info_keeps_camera_state_without_operation_help() -> void:
   var scene: Node3D = auto_free(DEBUG_DRAW_3D_SCENE.instantiate()) as Node3D
   add_child(scene)
