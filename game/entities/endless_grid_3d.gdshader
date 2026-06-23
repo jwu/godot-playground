@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode unshaded, blend_mix, cull_disabled, fog_disabled;
+render_mode unshaded, blend_mix, depth_draw_always, cull_disabled, fog_disabled;
 
 uniform float grid_size = 2000.0;
 uniform float cell_size = 1.0;

@@ -86,6 +86,7 @@ func _ensure_shader_material() -> void:
 
   _shader_material = ShaderMaterial.new()
   _shader_material.shader = GRID_SHADER
+  _shader_material.render_priority = -128
   material_override = _shader_material
 
 

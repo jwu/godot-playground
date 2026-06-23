@@ -16,10 +16,7 @@ const ZOOM_DRAG_SPEED := 1.0 / 80.0
 const DEFAULT_DISTANCE := 4.0
 const FREELOOK_BASE_SPEED := 5.0
 
-@export var initial_yaw := PI * 0.4
-@export var initial_pitch := PI * 0.2
 @export var initial_distance := DEFAULT_DISTANCE
-@export var initial_target := Vector3.ZERO
 
 var _yaw := 0.0
 var _pitch := 0.0
@@ -30,10 +27,12 @@ var _freelook_active := false
 
 
 func _ready() -> void:
-  _yaw = initial_yaw
-  _pitch = initial_pitch
+  # 从编辑器设置的相机 Transform 反推内部 orbit 状态，不再使用硬编码的初始值。
+  var forward := -global_transform.basis.z.normalized()
+  _pitch = asin(clampf(-forward.y, -1.0, 1.0))
+  _yaw = atan2(-forward.z, -forward.x)
   _distance = initial_distance
-  _target = initial_target
+  _target = global_position + forward * _distance
   _update_camera()
 
 
